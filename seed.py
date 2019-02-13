@@ -27,28 +27,28 @@ def load_books():
         db.session.add(book)
         db.session.commit()
 
-def load_users():
-    """Load users from u.user into database."""
+# def load_users():
+#     """Load users from u.user into database."""
 
-    print("Users")
+#     print("Users")
 
-    # ©Delete all rows in table, so if we need to run this a second time,
-    # we won't be trying to add duplicate users
-    User.query.delete()
+#     # ©Delete all rows in table, so if we need to run this a second time,
+#     # we won't be trying to add duplicate users
+#     User.query.delete()
 
-    # Read u.user file and insert data
-    for row in open("u.user"):
-        row = row.rstrip()
-        user_id, age, gender, occupation, zipcode = row.split("|")
-        print(zipcode)
-        user = User(user_id=user_id,
-                    age=age)
+#     # Read u.user file and insert data
+#     for row in open("u.user"):
+#         row = row.rstrip()
+#         user_id, age, gender, occupation, zipcode = row.split("|")
+#         print(zipcode)
+#         user = User(user_id=user_id,
+#                     age=age)
 
-        # We need to add to the session or it won't ever be stored
-        db.session.add(user)
+#         # We need to add to the session or it won't ever be stored
+#         db.session.add(user)
 
-    # Once we're done, we should commit our work
-    db.session.commit()
+#     # Once we're done, we should commit our work
+#     db.session.commit()
             
         
 
