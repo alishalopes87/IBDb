@@ -20,11 +20,9 @@ def load_books():
         language_code,average_rating,ratings_count,work_ratings_count,work_text_reviews_count,
         ratings_1,ratings_2,ratings_3,ratings_4,ratings_5,image_url,small_image_url) = row.split("\t")
         
-        book = Book(ISBN=isbn,
+        book = Book(book_id=book_id,
                     author=authors,
-                    title=title,
-                    average_rating=average_rating,
-                    publication_year=original_publication_year)
+                    title=title)
 
         db.session.add(book)
         db.session.commit()
@@ -44,8 +42,7 @@ def load_users():
         user_id, age, gender, occupation, zipcode = row.split("|")
         print(zipcode)
         user = User(user_id=user_id,
-                    age=age,
-                    zipcode=zipcode)
+                    age=age)
 
         # We need to add to the session or it won't ever be stored
         db.session.add(user)
@@ -62,5 +59,5 @@ if __name__ == "__main__":
     db.create_all()
 
     # Import different types of data
-    load_users
+
     load_books()

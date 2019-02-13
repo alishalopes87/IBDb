@@ -30,12 +30,9 @@ class Book(db.Model):
 
     __tablename__ = "books"
 
-    ISBN = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
-    author = db.Column(db.String(50))
-    publication_year = db.Column(db.String(10), nullable=True)
-    average_rating = db.Column(db.Integer, nullable=True)
-    publication_year = db.Column(db.Integer, nullable=True)
+    book_id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(1000))
+    author = db.Column(db.String(1000))
     
     book_shelves = db.relationship('Book_shelf')
 
@@ -52,7 +49,7 @@ class Book_shelf(db.Model):
 
     booking_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    ISBN = db.Column(db.Integer, db.ForeignKey('books.ISBN'))
+    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'))
 
         # Define relationship to user
     users = db.relationship("User")
