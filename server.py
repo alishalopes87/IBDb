@@ -20,6 +20,11 @@ def indenx():
 
     return render_template("homepage.html")
 
+@app.route('register', methods=['GET'])
+def registration_form():
+    """Recieve user information"""
+
+    return render_template("registration_form.html")
 
 @app.route('/register', methods=["POST"])
 def register_process():
@@ -40,26 +45,33 @@ def register_process():
 
     return redirect("/")
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login_process():
     """Process user login"""
 
+
     email = request.form['email']
     password = request.form['password']
+    try:
+        user = User.query.filter_by(email=email).first()
 
-    user = User.query.filter_by(email=email).first()
+        if user.password == password
+            session['email'] = email
+            session['password'] = password
 
-    if not user:
-        flash("Email not recognized, please try again.")
-        return redirect('/login')
+            flash("Successfully logged in")
 
-    if user.password != password:
-        flash("Incorrect password, try again")
-        return redirect('/login')
+        if not user:
+            flash("Email not recognized, please try again.")
+            return redirect('/login')
 
-    session['user_id']  = user.user_id
+        if user.password != password:
+            flash("Incorrect password, try again")
+            return redirect('/login')
 
-    flash('Logged in')
+        session['user_id']  = user.user_id
+
+        flash('Logged in')
 
 @app.route('/logout')
 def logout():

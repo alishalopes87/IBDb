@@ -1,24 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Ratings</title>
+    
+        <title>Ratings</title>
+        
 </head>
 <body>
+    <hr>
 
-{% if "user_id" in session %}
-  <a href="/logout">Logout</a>
-{% else %}
-  <a href="/login">Login</a>
-{% endif %}
+{% block flash %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
+{% endblock %}
 
-<hr>
+{% block content %} 
 
-{% for flash in get_flashed_messages() %}
-  {{ flash }}
-{% endfor %}
-
-{% block content %}
-  Put your body here.
 {% endblock %}
 
 </body>
