@@ -1,27 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
-    
-        <title>Ratings</title>
-        
+    <title>Ratings</title>
 </head>
 <body>
-    <hr>
 
-{% block flash %}
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
-        {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-{% endwith %}
-{% endblock %}
 
-{% block content %} 
+{% for flash in get_flashed_messages() %}
+  {{ flash }}
+{% endfor %}
 
+{% block content %}
+  Put your body here.
 {% endblock %}
 
 </body>

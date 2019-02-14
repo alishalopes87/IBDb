@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Register</h1>
+
+<form action="/register" method="POST">
+
+  <div>
+    <label>
+      Email
+      <input type="email" name="email">
+    </label>
+  </div>
+
+  <div>
+    <label>
+      Password
+      <input type="password" name="password">
+    </label>
+  </div>
+
+  <div>
+    <label>
+      Age
+      <input type="number" name="age">
+    </label>
+  </div>
+
+  <div>
+    <label>
+      First Name
+      <input type="text" name="fname">
+    </label>
+  </div>
+
+  <div>
+    <div>
+    <label>
+      Last Name
+      <input type="text" name="lname">
+    </label>
+  </div>
+
+  <div>
+    <input type="submit" value="Register">
+  </div>
+
+</form>
+
+{% endblock %}

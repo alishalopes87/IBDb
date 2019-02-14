@@ -14,9 +14,11 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(50), nullable=True, unique=True)
-    password = db.Column(db.String(50), nullable=True)
-    age = db.Column(db.Integer, nullable=True)
+    fname = db.Column(db.String(50), nullable=False)
+    lname = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(50), nullable=False)
+    age = db.Column(db.Integer)
 
     book_shelves = db.relationship("Book_shelf")
 

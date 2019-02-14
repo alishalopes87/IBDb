@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>{{ user.fname }} ({{ user.lname }})</h1>
+
+  <p>email: {{ user.email }}</p>
+  <h2>book</h2>
+    <ul>
+    {% if user.book_shelves %}
+      {% for book in user.book_shelves %}
+      <li>
+        <a href="/book/{{ book.book_id }}">{{ book_shelve.book.title }}</a>
+      </li>
+    {% endfor %}
+    </ul>
+
+  {% endif %}
+
+{% endblock %}
