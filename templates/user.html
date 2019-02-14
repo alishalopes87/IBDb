@@ -8,9 +8,6 @@
     <ul>
     {% if user.book_shelves %}
       {% for book in user.book_shelves %}
-      <li>
-        <a href="/book/{{ book.book_id }}">{{ book_shelve.book.title }}</a>
-      </li>
     {% endfor %}
     </ul>
 

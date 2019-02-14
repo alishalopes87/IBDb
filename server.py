@@ -3,6 +3,7 @@
 from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session)
+from flask_table import Table, Col
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Book_shelf, Book, connect_to_db, db
@@ -87,7 +88,7 @@ def logout():
     flash('Logged out')
     return redirect('/')
 
-@app.route("/<int:user_id>", methods=['GET', 'POST'])
+@app.route("/User/<int:user_id>", methods=['GET', 'POST'])
 def user_detail(user_id):
     """Show info about user."""
 
@@ -112,7 +113,10 @@ def search_results(search):
     title = search_string
     qry = Book.query
     qry = qry.filter_by(title=title)
-    results = qry.all()
+    results = qry.one()
+    book_id = results.book_id
+
+    print('**********',results.book_id,'*********')
 
     # for choice in BookSearchForm.choices:
     #     print('***************',choice,'***************')
@@ -134,8 +138,20 @@ def search_results(search):
         flash('No results found!')
         return redirect("/")
     else:
-        # display results
-        return render_template('results.html', results=results)
+        # # display results
+        # return render_template('results.html', results=results)
+        return redirect(f"/Book/{book_id}")
+
+@app.route("/Book/<int:book_id>", methods=['GET'])
+def book_detail(book_id):
+    """Show info about book
+    if user if logged in 
+    """
+
+    book = Book.query.get(book_id)
+
+    return render_template("book.html",
+                            book=book)
 
 
 if __name__ == "__main__":

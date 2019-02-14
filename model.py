@@ -42,7 +42,7 @@ class Book(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed"""
 
-        return f"Book ISBN={self.ISBN} title={self.title}>"
+        return f"title={self.title} author={self.author}>"
                                          
 class Book_shelf(db.Model):
     """Book_shelf of website"""
