@@ -35,6 +35,7 @@ class Book(db.Model):
     book_id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(1000))
     author = db.Column(db.String(1000))
+    small_image_url = db.Column(db.String(500))
     
     book_shelves = db.relationship('Book_shelf')
 
@@ -63,8 +64,8 @@ class Book_shelf(db.Model):
         """Provide helpful representation when printed."""
 
         return f"""<Book_shelf booking_id={self.booking_id} 
-                   email={self.email} 
-                   title={self.title}"""
+                   User-{self.user_id} 
+                   book_id={self.book_id}"""
 
 def connect_to_db(app):
     """Connect the database to our Flask app."""

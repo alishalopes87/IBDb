@@ -3,7 +3,6 @@
 from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session)
-from flask_table import Table, Col
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Book_shelf, Book, connect_to_db, db
@@ -34,7 +33,8 @@ def registration_form():
 @app.route('/register', methods=["POST"])
 def register_process():
     """Add user information to database"""
-
+#homepage to register
+#or button to login
     email = request.form["email"]
     password = request.form['password']
     fname = request.form['fname']
@@ -78,7 +78,7 @@ def login_process():
     session["user_id"] = user.user_id
 
     flash("Logged in")
-    return redirect(f"/{user.user_id}")
+    return redirect(f"/User/{user.user_id}")
 
 @app.route('/logout')
 def logout():
@@ -97,11 +97,19 @@ def user_detail(user_id):
 
 @app.route("/index", methods=['GET', 'POST'])
 def index():
+#https://www.blog.pythonlibrary.org/2017/12/13/flask-101-how-to-add-a-search-form/
     search = BookSearchForm(request.form)
     if request.method == 'POST':
         return search_results(search)
 
     return render_template('index.html', form=search)
+
+@app.route("/books")
+def book_list():
+    """Show list of books."""
+
+    books = Book.query.order_by('title').all()
+    return render_template("book_list.html", books=books)
 
 @app.route('/results')
 def search_results(search):
@@ -142,6 +150,7 @@ def search_results(search):
         # return render_template('results.html', results=results)
         return redirect(f"/Book/{book_id}")
 
+
 @app.route("/Book/<int:book_id>", methods=['GET'])
 def book_detail(book_id):
     """Show info about book
@@ -149,10 +158,31 @@ def book_detail(book_id):
     """
 
     book = Book.query.get(book_id)
+    session["book_id"] = book.book_id
 
     return render_template("book.html",
                             book=book)
 
+@app.route("/add_book/<int:book_id>",methods=['POST'])
+def add_book_to_user_shelf(book_id):
+    """Select book from database and add to users bookshelf"""
+      
+
+    user_id = session.get("user_id")
+
+
+
+    new_shelf =Book_shelf(book_id=book_id, user_id=user_id)
+
+    db.session.add(new_shelf)
+    db.session.commit()
+    flash("Book added to your shelf")
+    #delete what was in session just book
+    
+    # clicked=None
+    # if request.method == "POST":
+    #     clicked=request.json['data']
+    return redirect(f"/User/{user_id}")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

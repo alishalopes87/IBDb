@@ -4,10 +4,12 @@
   <h1>{{ user.fname }} ({{ user.lname }})</h1>
 
   <p>email: {{ user.email }}</p>
-  <h2>book</h2>
+  <h2>Book_Shelf</h2>
     <ul>
     {% if user.book_shelves %}
-      {% for book in user.book_shelves %}
+      {% for book_shelf in user.book_shelves %}
+      <li> Title: {{ book_shelf.books.title }} 
+       Author: {{ book_shelf.books.author }}</li>
     {% endfor %}
     </ul>
 

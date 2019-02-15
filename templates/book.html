@@ -1,7 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h1>{{ book.title }} ({{ book.author }})</h1>
-
+  <h1 class='book'>{{ book.title }} ({{ book.author }})</h1>
+<p>{{ book.small_image_url }}</p>
+<div>
+    <form action="/add_book/{{book.book_id}}" method="POST">
+Would you like to add this book to your book shelf? <button class='save'>Save</button>
+    </form>
+</div>
 
 {% endblock %}
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="static/project.js"></script>
