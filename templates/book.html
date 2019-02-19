@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h1 class='book'>{{ book.title }} ({{ book.author }})</h1>
-<p>{{ book.small_image_url }}</p>
+  <h1 class='book'>{{ book.title }} {{ book.author }}</h1>
+<img src="{{ book.image_url }}" height="250" width="200">
 <div>
     <form action="/add_book/{{book.book_id}}" method="POST">
 Would you like to add this book to your book shelf? <button class='save'>Save</button>
@@ -13,3 +13,4 @@ Would you like to add this book to your book shelf? <button class='save'>Save</b
 
 <script src="http://code.jquery.com/jquery.js"></script>
 <script type="text/javascript" src="static/project.js"></script>
+

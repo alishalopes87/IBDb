@@ -33,8 +33,10 @@ class Book(db.Model):
     __tablename__ = "books"
 
     book_id = db.Column(db.Integer, primary_key=True)
+    #ol_author_id = db.Column(db.Integer, db.ForeignKey('authors.author_ol_id'))
     title = db.Column(db.String(1000))
     author = db.Column(db.String(1000))
+    image_url = db.Column(db.String(1000))
     small_image_url = db.Column(db.String(500))
     
     book_shelves = db.relationship('Book_shelf')
@@ -44,6 +46,17 @@ class Book(db.Model):
         """Provide helpful representation when printed"""
 
         return f"title={self.title} author={self.author}>"
+
+# class Author(db.Model):
+#     """Author table of webste"""
+
+#     __tablename__ ="authors"
+
+    
+#     author_ol_id  = db.Column(db.String(100), unique=True, primary_key=True)
+#     name= db.Column(db.String(1000))
+
+#     books = db.relationship("Book")
                                          
 class Book_shelf(db.Model):
     """Book_shelf of website"""

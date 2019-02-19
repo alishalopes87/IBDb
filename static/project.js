@@ -1,18 +1,17 @@
-$(document).ready(function() {
-    $('save').on('click', function(event) {
-        $.ajax({
-            url: '/add_book',
-            contentType: 'application/json;charset=UTF-8',
-            data : {
-                book : $('book').val(),
-            }
-            type: 'POST',
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
-    });
+function showResults(results){
+    console.log(results)
+    console.log(results.title
+    $('#title').html(results.title);
+    $('#author').html(results.author);
+    $("#book_url").attr("href", results.book_url)
+}
+
+$('#getInfo').on('submit', evt => {
+    evt.preventDefault();
+    const searchData = {
+        book: $('#book').val()
+    };
+
+    $.get("/search-books.json", searchData, showResults)
 });
+

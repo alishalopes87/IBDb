@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>Search books by title</h1>
+
+  <form id="getInfo">
+    <label>Enter title:
+    <input type="text" id="book" name="book"></input></label>
+    <input type="submit" value="Submit">
+  </form>
+
+ <div id="book-results">Search Results</div>
+<p>
+  <ul>
+    <li><b>Title: <span id='title'></span></li>
+    <li>Author: <span id='author'>Unknown</span></li>
+    <a id="book_url" href="#">More info here</a>
+  </ul>
+</p>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="/static/project.js"></script>
+
+
+
+{% endblock %}
+
+

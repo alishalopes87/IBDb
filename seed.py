@@ -21,6 +21,7 @@ def load_books():
         ratings_1,ratings_2,ratings_3,ratings_4,ratings_5,image_url,small_image_url) = row.split("\t")
         
         book = Book(book_id=book_id,
+                    image_url=image_url,
                     small_image_url=small_image_url,
                     author=authors,
                     title=title)
