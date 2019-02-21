@@ -2,7 +2,7 @@
 
 from jinja2 import StrictUndefined
 
-from flask import (Flask, render_template, redirect, request, flash, session,jsonify)
+from flask import (Flask, render_template, redirect, request, flash, session,jsonify, abort)
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Book_shelf, Book, connect_to_db, db
@@ -19,36 +19,40 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/search-books.json')
 def search_to_books():
     results = []
+    books = []
+
     title = request.args.get('book')
-    books = Book.query.filter(Book.title.like('%' + title + '%')).all()
-    # for book in books:
-    # #     results.append(book)
-    # return jsonify(books=books.serialize)
+    author = request.args.get('author')
+
+    if title:
+        books = Book.query.filter(Book.title.ilike('%' + title + '%')).all()
+
+    elif author:
+        books = Book.query.filter(Book.author.ilike('%' + author + '%')).all()
+    else:
+        abort(400)
+
     for book in books:
         
         book = {
-            'book_id': book.book_id,
-            'title': book.title,
-            'author': book.author,
-            'image_url': book.image_url,
-            'small_image_url': book.small_image_url,
-            'book_url': '/Book/{}'.format(book.book_id)
+        'book_id': book.book_id,
+        'title': book.title,
+        'author': book.author,
+        'image_url': book.image_url,
+        'small_image_url': book.small_image_url,
+        'book_url': '/Book/{}'.format(book.book_id)
         }
        
+        results.append(book)
 
-        j_books= json.dumps(book)
-        results.append(j_books)
-
-   
-
-    return jsonify(book)
+    return jsonify(*results)
 
 
 @app.route('/search-books')
 def search_books_form():
     """Search form for user to search books"""
 
-    #pass the query and return results
+    #refresh page with new search
     return render_template('search.html')
 
 @app.route('/')
@@ -170,8 +174,26 @@ def add_book_to_user_shelf(book_id):
     else:
         flash("Must be logged in to save")
         return redirect(f"/")
-    
-    
+
+# @app.route("/delete_book<int:book_id>", methods=['POST'])
+# def delete_book_from_user_shelf(book_id):
+#     """Delete book from users shelf"""
+
+#     user_id = session.get("user_id")
+
+#     if user_id:
+
+#         book = Book.query.get(book_id)
+#         book.delete()  
+
+#         db.session.commit()
+
+#         flash("Book deleted from your shelf")
+#         return redirect(f"User/{user_id}")
+
+#     else:
+#         flash("Must be logged in to delete")
+#         return redirect(f"/")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the

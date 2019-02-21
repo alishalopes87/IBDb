@@ -33,31 +33,54 @@ class Book(db.Model):
     __tablename__ = "books"
 
     book_id = db.Column(db.Integer, primary_key=True)
-    #ol_author_id = db.Column(db.Integer, db.ForeignKey('authors.author_ol_id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('authors.author_id'))
     title = db.Column(db.String(1000))
-    author = db.Column(db.String(1000))
-    image_url = db.Column(db.String(1000))
-    small_image_url = db.Column(db.String(500))
+    isbn_10 = db.Column(db.String(100))
+    isbn_13 = db.Column(db.String(100))
+    subjects = db.Column(db.String(2000))
     
-    book_shelves = db.relationship('Book_shelf')
+    subjects = db.relationship("Subject",
+                                secondary="book_subjects",
+                                backref="books")
 
+    book_shelves = db.relationship('Book_shelf')
 
     def __repr__(self):
         """Provide helpful representation when printed"""
 
         return f"title={self.title} author={self.author}>"
 
-# class Author(db.Model):
-#     """Author table of webste"""
+class Author(db.Model):
+    """Author table of webste"""
 
-#     __tablename__ ="authors"
+    __tablename__ ="authors"
 
-    
-#     author_ol_id  = db.Column(db.String(100), unique=True, primary_key=True)
-#     name= db.Column(db.String(1000))
+    author_id = db.Column(db.Integer, primary_key=True)
+    author_ol_id  = db.Column(db.String(100), unique=True)
+    name= db.Column(db.String(1000))
 
-#     books = db.relationship("Book")
+    books = db.relationship("Book")
 
+class Subject(db.Model):
+    """Subject of book."""
+
+    __tablename__ = "subjects"
+
+    subject_id = db.Column(db.Integer, primary_key=True)
+    subject_name = db.Column(db.String(250), unique=True)
+
+class BookSubjects(db.Model):
+    """Subject of a specific book."""
+
+    __tablename__ = "book_subjects"
+
+    book_subject_id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer,
+                        db.ForeignKey('books.book_id'),
+                        nullable=False)
+    subject_id = db.Column(db.Integer,
+                            db.ForeignKey('subjects.subject_id'),
+                            nullable=False)
                                          
 class Book_shelf(db.Model):
     """Book_shelf of website"""
@@ -85,7 +108,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///book_shelves'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///shelves'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
@@ -98,4 +121,3 @@ if __name__ == "__main__":
     from server import app
     connect_to_db(app)
     print("Connected to DB.")
-
