@@ -1,8 +1,6 @@
 function showResults(results){
-    console.log(results)
-    console.log(results.title)
-    let ulHtml = $('<ul>')
-    for(let i in results){
+   if(Array.isArray(results)){
+        for(let i in results){
         let book= results[i]
         console.log(typeof(book))
         let ulHtml = $('<ul>')
@@ -12,10 +10,21 @@ function showResults(results){
         
         // listAuthor.text(book.author)
         // $('#book-results').append('Author',listAuthor)
+        let newLi = $('<li>')
         let bookUrl = $('<a>')
+        newLi.append(bookUrl)
         bookUrl.text(book.title)
         bookUrl.attr("href", book.book_url)
-        $('#book-results').append(bookUrl)
+        $('#book-results').append(newLi)
+    }
+    }else{
+        let book = results 
+        let newLi = $('<li>')
+        let bookUrl = $('<a>')
+        newLi.append(bookUrl)
+        bookUrl.text(book.title)
+        bookUrl.attr("href", book.book_url)
+        $('#book-results').append(newLi) 
         
   }
 };  
@@ -29,26 +38,35 @@ $('#getInfo').on('submit', evt => {
     $.get("/search-books.json", searchData, showResults)
 });
 
-function showAuthorResults(results){
-    console.log(results)
-    console.log(results.title)
-    let ulHtml = $('<ul>')
-    for(let i in results){
-        let book= results[i]
-        console.log(typeof(book))
-        let ulHtml = $('<ul>')
+function showAuthorResults(results){ 
+    if(Array.isArray(results)){
+        for(let i in results){
+        console.log(results)
+        let author= results[i]
+        console.log(author)
+        let newLi = $('<li>')
         let bookUrl = $('<a>')
-        bookUrl.text(book.title)
-        bookUrl.attr("href", book.book_url)
-        $('#book-results').append(bookUrl)
-        
-  }
+        newLi.append(bookUrl)
+        bookUrl.text(author.name)
+        bookUrl.attr("href", author.author_url)
+        $('#book-results').append(newLi)
+        }
+    } else{
+        let author = results
+        console.log(author)
+        let newLi = $('<li>')
+        let bookUrl = $('<a>')
+        newLi.append(bookUrl)
+        bookUrl.text(author.name)
+        bookUrl.attr("href", author.author_url)
+        $('#book-results').append(newLi)
+    }
 };    
 
 $('#getAuthor').on('submit', evt => {
     evt.preventDefault();
     const searchData = {
-        book: $('#author').val()
+        author: $('#author').val()
     };
 
     $.get("/search-books.json", searchData, showAuthorResults)

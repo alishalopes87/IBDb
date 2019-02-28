@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>{{ author.name }} </h1>
+
+  
+  <h2>Books by author </h2>
+    <ul>
+    {% if author %}
+    {% for book in author.authors_books %}
+    <li> Title: {{ book.books.title  }} <form 
+      action="/add_book/{{book.book_id}}" method="POST">
+      Would you like to add this book to your book shelf? <button class='save'>Save</button>
+    </form></li>
+    </ul>
+    {% endfor %}
+
+  {% endif %}
+
+{% endblock %}

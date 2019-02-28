@@ -3,7 +3,7 @@
 
   <h1>Books</h1>
   <ul>
-  {% for book in books %}
+  {% for book in books.items %}
     <li>
       <a href="/Book/{{ book.book_id }}">{{ book.title }}</a>
     </li>

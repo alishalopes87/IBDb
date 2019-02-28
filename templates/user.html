@@ -14,8 +14,7 @@
     <ul>
     {% if user.book_shelves %}
       {% for book_shelf in user.book_shelves %}
-      <li> Title: {{ book_shelf.books.title }} 
-       Author: {{ book_shelf.books.author }}</li>
+      <li> Title: {{ book_shelf.books.title }} <form action="/delete_book/{{book_shelf.booking_id}}" method="POST"><button> Delete</button></form></li>
     {% endfor %}
     </ul>
 

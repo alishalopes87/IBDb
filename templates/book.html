@@ -1,8 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h1 class='book'>{{ book.title }} {{ book.author }}</h1>
-<img src="{{ book.image_url }}" height="250" width="200">
+  <h1 class='book'>{{ book.title }}</h1>
+  <h2>{{ author.name }}</h2>
+  
+   <div class="container">
+    <div class="row">
+      <div class="col-lg-2 col-md-10 mx-auto">
+        {% if cover_img %}
+          <div id="book-img">
+            <span id ="cover-img">
+              <img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
+            </span>
+          </div>
+        </div>
+        {% endif %}
 <div>
     <form action="/add_book/{{book.book_id}}" method="POST">
 Would you like to add this book to your book shelf? <button class='save'>Save</button>

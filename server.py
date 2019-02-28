@@ -3,9 +3,12 @@
 from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session,jsonify, abort)
+from sqlalchemy.orm.attributes import flag_modified 
+from sqlalchemy import func
+from sqlalchemy_searchable import search
 from flask_debugtoolbar import DebugToolbarExtension
-
-from model import User, Book_shelf, Book, connect_to_db, db
+import requests
+from model_2 import Authors_books, User, Book_shelf, Book, Author, Subject,  Book_subjects, connect_to_db, db
 
 import json
 
@@ -18,35 +21,48 @@ app.jinja_env.undefined = StrictUndefined
 
 @app.route('/search-books.json')
 def search_to_books():
+
+
     results = []
-    books = []
 
     title = request.args.get('book')
     author = request.args.get('author')
 
     if title:
-        books = Book.query.filter(Book.title.ilike('%' + title + '%')).all()
+        query = db.session.query(Book)
+        query = search(query, title,sort=True)
+        print(query.first().title)
+        books = query.filter(Book.title.ilike('%' + title + '%')).all()
+        
+
+        for book in books:
+
+            book = {
+            'author':book.author_ol_id,
+            'book_id': book.book_id,
+            'title': book.title,
+            'book_url': '/Book/{}'.format(book.book_id)
+            }
+       
+            results.append(book)
 
     elif author:
-        books = Book.query.filter(Book.author.ilike('%' + author + '%')).all()
-    else:
-        abort(400)
 
-    for book in books:
-        
-        book = {
-        'book_id': book.book_id,
-        'title': book.title,
-        'author': book.author,
-        'image_url': book.image_url,
-        'small_image_url': book.small_image_url,
-        'book_url': '/Book/{}'.format(book.book_id)
-        }
-       
-        results.append(book)
+        query= db.session.query(Author)
+        query = search(query, author,sort=True)
+        authors = query.filter(Author.name.ilike('%' + author + '%')).all()
+        print(query.first().name)
+
+        for author in authors:
+            author ={
+            'author_ol_id': author.author_ol_id,
+            'name': author.name,
+            'author_url': '/Author/{}'.format(author.author_id)
+            }
+
+            results.append(author)
 
     return jsonify(*results)
-
 
 @app.route('/search-books')
 def search_books_form():
@@ -67,6 +83,7 @@ def registration_form():
     """Recieve user information"""
 
     return render_template("registration_form.html")
+
 
 @app.route('/register', methods=["POST"])
 def register_process():
@@ -138,8 +155,36 @@ def user_detail(user_id):
 def book_list():
     """Show list of books."""
 
-    books = Book.query.order_by('title').all()
+    page = request.args.get('page', 1, type=int)
+    books = Book.query.paginate(page=page,per_page=50)
+    # books = Book.query.order_by('title').all()
     return render_template("book_list.html", books=books)
+
+@app.route("/Author/<int:author_id>", methods=['GET'])
+def author_info(author_id):
+    """Show books written by author"""
+
+    author = Author.query.get(author_id)
+    print(author.author_ol_id)
+    
+    author_books = Authors_books.query.filter_by(author_ol_id=author.author_ol_id).all()
+    print(author_books)
+    return render_template('author.html', author=author,author_books=author_books)
+        
+    # author = Author.query.get(author_id)x
+    # books = Authors_books.query.filter(Authors_books.author_ol_id
+    #     ==author.author_ol_id).all()
+
+
+   
+    # print(books)
+    # print(author.author_ol_id)
+    # author = Authors_books.query.filter(Authors_books.author_ol_id==author.author_ol_id).one()
+    # print('********',author,'***********')
+    # auth_shelf = author.authors_books
+    # print('********',auth_shelf,'***********')
+
+
 
 @app.route("/Book/<int:book_id>", methods=['GET'])
 def book_detail(book_id):
@@ -148,10 +193,29 @@ def book_detail(book_id):
     """
 
     book = Book.query.get(book_id)
+    author = Author.query.filter(Author.author_ol_id==book.author_ol_id).one()
+
+     #get summary, genres and cover image from Google Books
+    url = "https://www.googleapis.com/books/v1/volumes"
+    payload = {"q": "isbn:{}".format(book.isbn_10), "key": "AIzaSyBamy3iueA4AN-cfCzd45r20cmHOkNySac"}
+
+
+    response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
+    # print(response.url)
+    book_json = response.json()
+
+    cover_img = None
+    if book_json["totalItems"] >= 1: # pragma: no cover
+        
+        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+        
+    
+
     session["book_id"] = book.book_id
 
     return render_template("book.html",
-                            book=book)
+                            book=book,
+                            author=author,response=response, cover_img=cover_img)
 
 @app.route("/add_book/<int:book_id>",methods=['POST'])
 def add_book_to_user_shelf(book_id):
@@ -175,25 +239,26 @@ def add_book_to_user_shelf(book_id):
         flash("Must be logged in to save")
         return redirect(f"/")
 
-# @app.route("/delete_book<int:book_id>", methods=['POST'])
-# def delete_book_from_user_shelf(book_id):
-#     """Delete book from users shelf"""
+@app.route("/delete_book/<int:booking_id>", methods=['POST'])
+def delete_book_from_user_shelf(booking_id):
+    """Delete book from users shelf"""
 
-#     user_id = session.get("user_id")
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
 
-#     if user_id:
+    if user_id:
 
-#         book = Book.query.get(book_id)
-#         book.delete()  
+        book_shelf = Book_shelf.query.get(booking_id)
+        db.session.delete(book_shelf) 
 
-#         db.session.commit()
+        db.session.commit()
 
-#         flash("Book deleted from your shelf")
-#         return redirect(f"User/{user_id}")
+        flash("Book deleted from your shelf")
+        return redirect(f"/User/{user.user_id}")
 
-#     else:
-#         flash("Must be logged in to delete")
-#         return redirect(f"/")
+    else:
+        flash("Must be logged in to delete")
+        return redirect(f"/")
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
