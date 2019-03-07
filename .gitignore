@@ -3,3 +3,5 @@ __pycache__
 *.pyc
 secrets.sh
 seed_data/
+.DS_Store
+
