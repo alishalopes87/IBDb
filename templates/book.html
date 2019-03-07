@@ -15,6 +15,30 @@
           </div>
         </div>
         {% endif %}
+        
+
+  {% if genres %}
+    <div id="book-genre">Genres:
+      <ul id="genres">
+        {% for genre in genres %}
+          <li> {{ genre }} </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+
+
+  {% if summary %}
+    <br>
+    <div id="book-summary">Summary: 
+      <span id="summary"> 
+        <div>
+        <p>{{ summary }}</p>
+      </div>
+      </span>
+    </div>
+  {% endif %}
 <div>
     <form action="/add_book/{{book.book_id}}" method="POST">
 Would you like to add this book to your book shelf? <button class='save'>Save</button>

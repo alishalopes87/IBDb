@@ -25,6 +25,10 @@ function showResults(results){
         bookUrl.text(book.title)
         bookUrl.attr("href", book.book_url)
         $('#book-results').append(newLi) 
+        newLi.append(bookUrl)
+        bookUrl.text(book.name)
+        bookUrl.attr("href", book.author_url)
+        $('#book-results').append(newLi)
         
   }
 };  
@@ -38,37 +42,37 @@ $('#getInfo').on('submit', evt => {
     $.get("/search-books.json", searchData, showResults)
 });
 
-function showAuthorResults(results){ 
-    if(Array.isArray(results)){
-        for(let i in results){
-        console.log(results)
-        let author= results[i]
-        console.log(author)
-        let newLi = $('<li>')
-        let bookUrl = $('<a>')
-        newLi.append(bookUrl)
-        bookUrl.text(author.name)
-        bookUrl.attr("href", author.author_url)
-        $('#book-results').append(newLi)
-        }
-    } else{
-        let author = results
-        console.log(author)
-        let newLi = $('<li>')
-        let bookUrl = $('<a>')
-        newLi.append(bookUrl)
-        bookUrl.text(author.name)
-        bookUrl.attr("href", author.author_url)
-        $('#book-results').append(newLi)
-    }
-};    
+// function showAuthorResults(results){ 
+//     if(Array.isArray(results)){
+//         for(let i in results){
+//         console.log(results)
+//         let author= results[i]
+//         console.log(author)
+//         let newLi = $('<li>')
+//         let bookUrl = $('<a>')
+//         newLi.append(bookUrl)
+//         bookUrl.text(author.name)
+//         bookUrl.attr("href", author.author_url)
+//         $('#book-results').append(newLi)
+//         }
+//     } else{
+//         let author = results
+//         console.log(author)
+//         let newLi = $('<li>')
+//         let bookUrl = $('<a>')
+//         newLi.append(bookUrl)
+//         bookUrl.text(author.name)
+//         bookUrl.attr("href", author.author_url)
+//         $('#book-results').append(newLi)
+//     }
+// };    
 
-$('#getAuthor').on('submit', evt => {
-    evt.preventDefault();
-    const searchData = {
-        author: $('#author').val()
-    };
+// $('#getAuthor').on('submit', evt => {
+//     evt.preventDefault();
+//     const searchData = {
+//         author: $('#author').val()
+//     };
 
-    $.get("/search-books.json", searchData, showAuthorResults)
-});
+//     $.get("/search-books.json", searchData, showAuthorResults)
+// });
 

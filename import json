@@ -1,6 +1,0 @@
-import json
-
-
-value = '{"foo": "bar"}'
-
-data = json.loads(value)

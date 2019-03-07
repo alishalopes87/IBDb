@@ -4,12 +4,13 @@ from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash, session,jsonify, abort)
 from sqlalchemy.orm.attributes import flag_modified 
+import sqlalchemy as sa
 from sqlalchemy import func
-from sqlalchemy_searchable import search
+from sqlalchemy_searchable import search, parse_search_query
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from model_2 import Authors_books, User, Book_shelf, Book, Author, Subject,  Book_subjects, connect_to_db, db
-
+from model_2 import *
+from pyisbn import convert as convert_isbn
 import json
 
 
@@ -29,10 +30,25 @@ def search_to_books():
     author = request.args.get('author')
 
     if title:
-        query = db.session.query(Book)
-        query = search(query, title,sort=True)
-        print(query.first().title)
-        books = query.filter(Book.title.ilike('%' + title + '%')).all()
+        # query = db.session.query(Book)
+        # print(query)
+        # query = search(query, title,sort=True)
+        combined_search_vector = (Book.search_vector | db.func.coalesce(Author.search_vector, u''))
+
+        books_query = (
+        db.session.query(Book)
+            .join(Author)
+            .filter(
+        combined_search_vector.match(parse_search_query(title)
+            )
+        )
+    )
+    
+        print("Please",title)
+        #do a join across tables and quiry on that join
+        books = books_query.limit(1).all()
+        print(books)
+        # books = query.filter(Book.title.ilike('%' + title + '%')).all()
         
 
         for book in books:
@@ -45,22 +61,24 @@ def search_to_books():
             }
        
             results.append(book)
+            #counting subjects 
+            #sort by language filter 
 
-    elif author:
+    # elif author:
 
-        query= db.session.query(Author)
-        query = search(query, author,sort=True)
-        authors = query.filter(Author.name.ilike('%' + author + '%')).all()
-        print(query.first().name)
+    #     query= db.session.query(Author)
+    #     query = search(query, author,sort=True)
+    #     # authors = query.filter(Author.name.ilike('%' + author + '%')).all()
+    #     authors = query.first()
 
-        for author in authors:
-            author ={
-            'author_ol_id': author.author_ol_id,
-            'name': author.name,
-            'author_url': '/Author/{}'.format(author.author_id)
-            }
+    #     for author in authors:
+    #         author ={
+    #         'author_ol_id': author.author_ol_id,
+    #         'name': author.name,
+    #         'author_url': '/Author/{}'.format(author.author_id)
+    #         }
 
-            results.append(author)
+    #         results.append(author)
 
     return jsonify(*results)
 
@@ -165,26 +183,11 @@ def author_info(author_id):
     """Show books written by author"""
 
     author = Author.query.get(author_id)
-    print(author.author_ol_id)
     
-    author_books = Authors_books.query.filter_by(author_ol_id=author.author_ol_id).all()
-    print(author_books)
+    author_books = author.get_books()
+   
     return render_template('author.html', author=author,author_books=author_books)
         
-    # author = Author.query.get(author_id)x
-    # books = Authors_books.query.filter(Authors_books.author_ol_id
-    #     ==author.author_ol_id).all()
-
-
-   
-    # print(books)
-    # print(author.author_ol_id)
-    # author = Authors_books.query.filter(Authors_books.author_ol_id==author.author_ol_id).one()
-    # print('********',author,'***********')
-    # auth_shelf = author.authors_books
-    # print('********',auth_shelf,'***********')
-
-
 
 @app.route("/Book/<int:book_id>", methods=['GET'])
 def book_detail(book_id):
@@ -193,29 +196,21 @@ def book_detail(book_id):
     """
 
     book = Book.query.get(book_id)
-    author = Author.query.filter(Author.author_ol_id==book.author_ol_id).one()
 
-     #get summary, genres and cover image from Google Books
-    url = "https://www.googleapis.com/books/v1/volumes"
-    payload = {"q": "isbn:{}".format(book.isbn_10), "key": "AIzaSyBamy3iueA4AN-cfCzd45r20cmHOkNySac"}
-
-
-    response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
-    # print(response.url)
-    book_json = response.json()
-
-    cover_img = None
-    if book_json["totalItems"] >= 1: # pragma: no cover
-        
-        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
-        
-    
-
+    author = book.get_author()
     session["book_id"] = book.book_id
+
+    book_json = book.get_google_metadata()
+    summary, cover_img, genres = book.parse_metadata(book_json)
+
 
     return render_template("book.html",
                             book=book,
-                            author=author,response=response, cover_img=cover_img)
+                            author=author,
+                            summary=summary, 
+                            cover_img=cover_img, 
+                            genres=genres)
+
 
 @app.route("/add_book/<int:book_id>",methods=['POST'])
 def add_book_to_user_shelf(book_id):
@@ -259,6 +254,42 @@ def delete_book_from_user_shelf(booking_id):
     else:
         flash("Must be logged in to delete")
         return redirect(f"/")
+@app.route('/get_graph_info.json', methods=['GET'])
+def create_graph_data():
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+
+    users_books = user.book_shelves 
+
+    nodes = []
+    links = []
+    data = {
+    "nodes": nodes,
+    "links": links
+    }
+
+    user = user.convert_info()
+    nodes.append(user)
+
+    for book in users_books:   
+        book_dict = book.convert_book_info()
+        nodes.append(book_dict)
+        print(book_dict)
+        links.append({"source": user["id"], "target": book_dict["id"]})
+
+        authors = book.books.authors_books
+        for author in authors:
+            author_dict = author.convert_info()
+            nodes.append(author_dict)
+            links.append({"source": book_id , "target": author_id})
+
+
+    return jsonify(data)
+
+@app.route('/graph')
+def display_graph():
+
+    return render_template('graph.html')
 
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
