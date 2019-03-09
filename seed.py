@@ -22,6 +22,10 @@ def add_and_dedup(subject):
     else:
         db.session.add(subject)
         return subject
+def get_author_name(author_ol_id):
+    author = Author.query.filter(Author.author_ol_id==author_ol_id).first()
+    if author:
+        return author.name
 
 def load_authors():
     counter= 0
@@ -66,6 +70,7 @@ def load_editions():
         language=None
         publishers=None
         publish_date=None
+        subjects=None
         counter = counter + 1
         if counter >=1000:
             break
@@ -84,7 +89,7 @@ def load_editions():
                 author_ol_id=None
             else:    
                 author_ol_id = info_dict['authors'][0]['key'][9:]
-            # print(author_ol_id)
+                search_authors = get_author_name(author_ol_id)
         if 'publishers' in info_dict:
             if not info_dict['publishers']:
                 publishers=None
@@ -99,6 +104,7 @@ def load_editions():
                 language=None
             else:
                 language = info_dict['languages'][0]['key'][11:]
+                print(language)
         if 'isbn_10' in info_dict:
             # print(info_dict['isbn_10'])
             if not info_dict['isbn_10']:
@@ -120,69 +126,73 @@ def load_editions():
         else:
             title = None
 
-        new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,title=title, language=language, publishers=publishers, publish_date=publish_date)
-        if add_and_dedup_editions(new_book) == None:
-            continue
-        db.session.commit()
+       
 
-        if counter % 100000 == 0:
-            print("added 100 books", counter)
+#         new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
+#             title=title, language=language, search_authors=search_authors,
+#             publishers=publishers, publish_date=publish_date)
+#         if add_and_dedup_editions(new_book) == None:
+#             continue
+#         db.session.commit()
 
-        new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
-        db.session.add(new_author)
-        db.session.commit()
-        if counter % 100000 == 0:
-            print("added 100000 author_books", counter)
+#         if counter % 100000 == 0:
+#             print("added 100 books", counter)
+
+#         new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
+#         db.session.add(new_author)
+#         db.session.commit()
+#         if counter % 100000 == 0:
+#             print("added 100000 author_books", counter)
                 
 
             
-        if 'subjects' in info_dict:
-            subject_list = info_dict['subjects']
+#         if 'subjects' in info_dict:
+#             subject_list = info_dict['subjects']
 
-            for subject in subject_list:
-                new_subject = Subject(subject_name=subject)
-                if add_and_dedup(new_subject) == None:
-                    continue
-                db.session.commit()
+#             for subject in subject_list:
+#                 new_subject = Subject(subject_name=subject)
+#                 if add_and_dedup(new_subject) == None:
+#                     continue
+#                 db.session.commit()
 
-                new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
-                db.session.add(new_subject)
-                db.session.commit()
-                if counter % 100000 == 0:
+#                 new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
+#                 db.session.add(new_subject)
+#                 db.session.commit()
+                
 
-                    print("added 100000 Book_subjects", counter)
+                    
            
-# def load_associates():
+# # def load_associates():
     
 
-# load_editions()              
-#                     #vagrant disk space?   
-#         # db.session.commit()
+# # load_editions()              
+# #                     #vagrant disk space?   
+# #         # db.session.commit()
        
 
                     
                         
             
-# #             #trim each of elements 
-# #             #strip to only numbers and letters
+# # #             #trim each of elements 
+# # #             #strip to only numbers and letters
 
 
 
-#         # print(subject_table)       
-#             #.remove or .split
-#         #     rejex to write pattern
-#         # subjects = "".join(subject_list)
-#         #make for loop 
-#         #check if added subjet before 
-#         #label with id
-#         #make subject table
-#         #make a dictionary between subject name: subject id in db
-#         #associate table between subject and book
-#         #subjects reference table
-#         #book subjects conecting bookid to subject id
+# #         # print(subject_table)       
+# #             #.remove or .split
+# #         #     rejex to write pattern
+# #         # subjects = "".join(subject_list)
+# #         #make for loop 
+# #         #check if added subjet before 
+# #         #label with id
+# #         #make subject table
+# #         #make a dictionary between subject name: subject id in db
+# #         #associate table between subject and book
+# #         #subjects reference table
+# #         #book subjects conecting bookid to subject id
     
     
-# #         book = Book(isbn_10=isbn_10, isbn_13=isbn_13, title=title)
+# # #         book = Book(isbn_10=isbn_10, isbn_13=isbn_13, title=title)
 
 
 # # def load_works():
@@ -204,7 +214,7 @@ if __name__ == "__main__":
     connect_to_db(app)
     db.configure_mappers() 
     # In case tables haven't been created, create them
-    db.create_all()
+    # db.create_all()
     # load_authors()
     load_editions()
 

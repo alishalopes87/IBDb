@@ -20,74 +20,76 @@ app.secret_key = "ABC"
 
 app.jinja_env.undefined = StrictUndefined
 
+
+
+@app.route('/search-subjects.json')
+def filter_by_subject():
+    results = []
+    subject = request.args.get('subject')
+    look_for = '{}%'.format(subject)
+    subjects = Subject.query.filter(Subject.subject_name.ilike(look_for)).limit(1).all()
+    for subject in subjects:
+        results.append(subject.subject_name)
+
+
+    return jsonify(*results)
+
+
 @app.route('/search-books.json')
 def search_to_books():
+#languages =  bul
 
+    keyword = request.args.get('book')
+    subjects = request.args.get('subjects')
+    print(subjects)
 
-    results = []
-
-    title = request.args.get('book')
-    author = request.args.get('author')
-
-    if title:
-        # query = db.session.query(Book)
-        # print(query)
-        # query = search(query, title,sort=True)
-        combined_search_vector = (Book.search_vector | db.func.coalesce(Author.search_vector, u''))
-
-        books_query = (
-        db.session.query(Book)
-            .join(Author)
-            .filter(
-        combined_search_vector.match(parse_search_query(title)
-            )
-        )
-    )
+    if keyword:
+        print(keyword)
     
-        print("Please",title)
-        #do a join across tables and quiry on that join
-        books = books_query.limit(1).all()
-        print(books)
-        # books = query.filter(Book.title.ilike('%' + title + '%')).all()
-        
+        if not subjects:
 
+            query = db.session.query(Book)
+            query = search(query, keyword,sort=True)
+            books = books = query.limit(10).all()
+            count = query.count()
+
+        else:
+
+            query = db.session.query(Book).join(Subject)
+            query = search(query, keyword,sort=True)
+            book_query = query.filter(Book.subjects.in_(subjects)).order_by(Book.title).all()
+            print(book_query)
+            books = query.limit(10).all()
+            count = query.count()
+            print(books)
+
+        results = []
         for book in books:
-
+            author = book.get_author()
             book = {
             'author':book.author_ol_id,
             'book_id': book.book_id,
             'title': book.title,
-            'book_url': '/Book/{}'.format(book.book_id)
+            'book_url': '/Book/{}'.format(book.book_id),
+            'author_name': author.name,
+            'author_url': '/Author/{}'.format(author.author_id)
             }
-       
+
             results.append(book)
-            #counting subjects 
-            #sort by language filter 
 
-    # elif author:
 
-    #     query= db.session.query(Author)
-    #     query = search(query, author,sort=True)
-    #     # authors = query.filter(Author.name.ilike('%' + author + '%')).all()
-    #     authors = query.first()
-
-    #     for author in authors:
-    #         author ={
-    #         'author_ol_id': author.author_ol_id,
-    #         'name': author.name,
-    #         'author_url': '/Author/{}'.format(author.author_id)
-    #         }
-
-    #         results.append(author)
-
-    return jsonify(*results)
+    return jsonify(*results, {"count":count})
 
 @app.route('/search-books')
 def search_books_form():
     """Search form for user to search books"""
+    book_languages = Book.query.filter(Book.language != None).all()
 
-    #refresh page with new search
-    return render_template('search.html')
+    languages = set()
+    for book in book_languages:
+        languages.add(book.language)
+
+    return render_template('search.html',languages=languages)
 
 @app.route('/')
 def indenx():
@@ -201,7 +203,12 @@ def book_detail(book_id):
     session["book_id"] = book.book_id
 
     book_json = book.get_google_metadata()
-    summary, cover_img, genres = book.parse_metadata(book_json)
+    if book_json:
+        summary, cover_img, genres = book.parse_metadata(book_json)
+    else:
+        response_ol = book.get_open_metadata()
+        if response_ol:
+            cover_img, summary, genres = book.parse_ol_metadata(response_ol)
 
 
     return render_template("book.html",
@@ -263,10 +270,6 @@ def create_graph_data():
 
     nodes = []
     links = []
-    data = {
-    "nodes": nodes,
-    "links": links
-    }
 
     user = user.convert_info()
     nodes.append(user)
@@ -274,17 +277,22 @@ def create_graph_data():
     for book in users_books:   
         book_dict = book.convert_book_info()
         nodes.append(book_dict)
-        print(book_dict)
         links.append({"source": user["id"], "target": book_dict["id"]})
 
-        authors = book.books.authors_books
-        for author in authors:
-            author_dict = author.convert_info()
-            nodes.append(author_dict)
-            links.append({"source": book_id , "target": author_id})
+        subjects = book.books.get_subjects()
+        print(subjects)
+        for subject in subjects:
+            subject_dict = subject.convert_info()
+            nodes.append(subject_dict)
+            links.append({"source": book_dict["id"], "target": subject_dict["id"]})
+
+        author = book.books.get_author()
+        author_dict = author.convert_info()
+        nodes.append(author_dict)
+        links.append({"source": book_dict["id"] , "target": author_dict["id"]})
 
 
-    return jsonify(data)
+    return jsonify({'nodes':nodes, 'links':links})
 
 @app.route('/graph')
 def display_graph():

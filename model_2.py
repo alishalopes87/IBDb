@@ -79,12 +79,13 @@ class Book(db.Model):
     isbn_10 = db.Column(db.String(100),index=True)
     isbn_13 = db.Column(db.String(100))
     publish_date = db.Column(db.String(1000),index=True)
+    search_authors = db.Column(db.String(100),index=True)
     publishers = db.Column(db.String(1000),index=True)
     language = db.Column(db.String(100), index=True)
     author_ol_id = db.Column(db.String(1000), db.ForeignKey('authors.author_ol_id'), nullable=False)
-    search_vector = db.Column(TSVectorType('title',
+    search_vector = db.Column(TSVectorType('title', 'search_authors',
                             catalog='pg_catalog.simple', 
-                            weights={'title': 'A'}))
+                            weights={'title': 'A', 'search_authors': 'B'}))
     subjects = db.relationship("Subject",
                                 secondary="book_subjects",
                                 backref="books")
@@ -98,6 +99,12 @@ class Book(db.Model):
 
         return f"title={self.title}"
 
+    def get_subjects(self):
+        """query db for subjects of associated book"""
+        return self.subjects
+
+
+
     def get_author(self):
         """query db for author by author_ol_id"""
 
@@ -108,12 +115,46 @@ class Book(db.Model):
 
         return self.isbn_10
 
+    def get_open_metadata(self):
+        """get metadata from openlibrary"""
+        isbn13 = self.isbn_13
+
+        #use isbn-13 to get url for nearby library search
+        if isbn13:
+            open_library_url = "https://openlibrary.org/api/books"
+            payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
+
+            response_ol = requests.get(open_library_url, params=payload)
+
+            return response_ol
+
+    def parse_ol_metadata(self, response_ol):
+        genres = []
+        summary = None
+        cover_img = None
+        response_ol_json = response_ol.json()
+
+        isbnstring = "ISBN:{}".format(self.isbn13)
+        if response_ol_json.get(isbnstring):
+            if response_ol_json[isbnstring].get('cover'):
+                cover_img = response_ol_json[isbnstring]["cover"]["medium"]
+                
+            if response_ol_json[isbnstring].get('excerpts'):
+                summary = response_ol_json[isbnstring]['excerpts'][0]['text']
+
+            if 'subjects' in response_ol_json[isbnstring]: 
+                for subject in response_ol_json[isbnstring]['subjects'][:3]:
+                    genres.append(subject['name'])
+
+        return cover_img, summary, genres
+
     def get_google_metadata(self):
         url = "https://www.googleapis.com/books/v1/volumes"
         payload = {"q": "isbn:{}".format(self.get_isbn_10()), "key": GOOGLEKEY}
         response = requests.get("https://www.googleapis.com/books/v1/volumes", params=payload)
         # print(response.url)
         return response.json()
+
     def parse_metadata(self,book_json):
         genres = []
         summary = None
@@ -128,34 +169,11 @@ class Book(db.Model):
                 summary = book_json["items"][0]["volumeInfo"]["description"]
             else:
                 summary = None
-            cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+            if "imageLinks" in book_json:
+                cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
 
-            
-        elif book_json["totalItems"] < 1: # pragma: no cover
-        #library.link requires isbn-13, so convert book.isbn to isbn-13
-            isbn13 = self.isbn_13
-
-        #use isbn-13 to get url for nearby library search
-            open_library_url = "https://openlibrary.org/api/books"
-            payload = {"bibkeys" : "ISBN:{}".format(isbn13), "format" : "json", "jscmd" : "data"}
-
-            response_ol = requests.get(open_library_url, params=payload)
-            if response_ol:
-                response_ol_json = response_ol.json()
-                print(response_ol_json)
-                isbnstring = "ISBN:{}".format(isbn13)
-            if response_ol_json.get(isbnstring):
-                if response_ol_json[isbnstring].get('cover'):
-                    cover_img = response_ol_json[isbnstring]["cover"]["medium"]
-                
-                if response_ol_json[isbnstring].get('excerpts'):
-                    summary = response_ol_json[isbnstring]['excerpts'][0]['text']
-                for subject in response_ol_json[isbnstring]['subjects'][:3]:
-                    genres.append(subject['name'])
 
         return summary, cover_img, genres
-    # def convert_to_dict(self):
-    #     """convert sqlalchemy book object to dictionary"""
 
 
 
@@ -197,7 +215,7 @@ class Author(db.Model):
 
         author_dict = {
             "id" : "author/{}".format(self.author_id),
-            "nodeName": self.author_name,
+            "nodeName": self.name,
             "type": "author"
             }
 
@@ -212,9 +230,21 @@ class Subject(db.Model):
     search_vector = db.Column(TSVectorType('subject_name',
                             catalog='pg_catalog.simple',
                              weights={'search_name': 'A'}))
-    #change to name 
 
     book_subjects = db.relationship("Book_subjects")
+    #change to name 
+    def convert_info(self):
+        """conver subject info to dictionary"""
+        subject_id= "subject/{}".format(self.subject_id)
+        subject_name = self.subject_name
+        subject_dict ={
+            "id" :subject_id,
+            "nodeName": subject_name,
+            "type": "subject"
+            }
+
+        return subject_dict
+
 
 class Book_subjects(db.Model):
     """Subject of a specific book."""
