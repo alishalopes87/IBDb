@@ -134,7 +134,7 @@ class Book(db.Model):
         cover_img = None
         response_ol_json = response_ol.json()
 
-        isbnstring = "ISBN:{}".format(self.isbn13)
+        isbnstring = "ISBN:{}".format(self.isbn_13)
         if response_ol_json.get(isbnstring):
             if response_ol_json[isbnstring].get('cover'):
                 cover_img = response_ol_json[isbnstring]["cover"]["medium"]
@@ -156,21 +156,24 @@ class Book(db.Model):
         return response.json()
 
     def parse_metadata(self,book_json):
-        genres = []
         summary = None
-        cover_img = None
+         # pragma: no cover
+        if "description" in book_json["items"][0]["volumeInfo"]:
+            summary = book_json["items"][0]["volumeInfo"]["description"]
+        cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+        genres = self.subjects
 
-        if book_json["totalItems"] >= 1: # pragma: no cover
-            if "categories" in book_json["items"][0]["volumeInfo"]:
-                genres = book_json["items"][0]["volumeInfo"]["categories"]
-            else:
-                genres = None
-            if "description" in book_json["items"][0]["volumeInfo"]:
-                summary = book_json["items"][0]["volumeInfo"]["description"]
-            else:
-                summary = None
-            if "imageLinks" in book_json:
-                cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+        # if book_json["totalItems"] >= 1: # pragma: no cover
+        #     if "categories" in book_json["items"][0]["volumeInfo"]:
+        #         genres = book_json["items"][0]["volumeInfo"]["categories"]
+        #     else:
+        #         genres = None
+        #     if "description" in book_json["items"][0]["volumeInfo"]:
+        #         summary = book_json["items"][0]["volumeInfo"]["description"]
+        #     else:
+        #         summary = None
+        #     if "imageLinks" in book_json:
+        #         cover_img = book_json["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
 
 
         return summary, cover_img, genres

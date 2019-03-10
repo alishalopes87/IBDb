@@ -45,12 +45,18 @@ function showResults(results){
 $('#getInfo').on('submit', evt => {
     evt.preventDefault();
     const searchData = {
-        book: $('#book').val()
+        var optionText = $("#language option:selected").text();
+        evt.preventDefault();
+        const searchData ={
+        book: $('#book').val(),
+        subject: $('#myInput').val(),
+        language: optionText
+
     };
-
     $.get("/search-books.json", searchData, showResults)
+     
 });
-
+console.log(searchData)
 // function showAuthorResults(results){ 
 //     if(Array.isArray(results)){
 //         for(let i in results){

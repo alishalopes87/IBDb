@@ -72,9 +72,7 @@ def load_editions():
         publish_date=None
         subjects=None
         counter = counter + 1
-        if counter >=1000:
-            break
-        
+      
 
         row = row.strip()
         # print(row)
@@ -104,7 +102,7 @@ def load_editions():
                 language=None
             else:
                 language = info_dict['languages'][0]['key'][11:]
-                print(language)
+                
         if 'isbn_10' in info_dict:
             # print(info_dict['isbn_10'])
             if not info_dict['isbn_10']:
@@ -128,36 +126,36 @@ def load_editions():
 
        
 
-#         new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
-#             title=title, language=language, search_authors=search_authors,
-#             publishers=publishers, publish_date=publish_date)
-#         if add_and_dedup_editions(new_book) == None:
-#             continue
-#         db.session.commit()
+        new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
+            title=title, language=language, search_authors=search_authors,
+            publishers=publishers, publish_date=publish_date)
+        if add_and_dedup_editions(new_book) == None:
+            continue
+        db.session.commit()
 
-#         if counter % 100000 == 0:
-#             print("added 100 books", counter)
+        if counter % 100000 == 0:
+            print("added 100 books", counter)
 
-#         new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
-#         db.session.add(new_author)
-#         db.session.commit()
-#         if counter % 100000 == 0:
-#             print("added 100000 author_books", counter)
+        new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
+        db.session.add(new_author)
+        db.session.commit()
+        if counter % 100000 == 0:
+            print("added 100000 author_books", counter)
                 
 
             
-#         if 'subjects' in info_dict:
-#             subject_list = info_dict['subjects']
+        if 'subjects' in info_dict:
+            subject_list = info_dict['subjects']
 
-#             for subject in subject_list:
-#                 new_subject = Subject(subject_name=subject)
-#                 if add_and_dedup(new_subject) == None:
-#                     continue
-#                 db.session.commit()
+            for subject in subject_list:
+                new_subject = Subject(subject_name=subject)
+                if add_and_dedup(new_subject) == None:
+                    continue
+                db.session.commit()
 
-#                 new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
-#                 db.session.add(new_subject)
-#                 db.session.commit()
+                new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
+                db.session.add(new_subject)
+                db.session.commit()
                 
 
                     

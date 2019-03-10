@@ -35,12 +35,14 @@ def filter_by_subject():
     return jsonify(*results)
 
 
-@app.route('/search-books.json')
+@app.route('/search-books.json', methods=["POST", "GET"])
 def search_to_books():
 #languages =  bul
 
     keyword = request.args.get('book')
-    subjects = request.args.get('subjects')
+    subjects = request.args.get('subject')
+    language = request.args.get('language')
+    print(language)
     print(subjects)
 
     if keyword:
@@ -55,10 +57,11 @@ def search_to_books():
 
         else:
 
-            query = db.session.query(Book).join(Subject)
+            query = db.session.query(Book).join(Book_subjects)
+            query = db.session.query(Book)
             query = search(query, keyword,sort=True)
-            book_query = query.filter(Book.subjects.in_(subjects)).order_by(Book.title).all()
-            print(book_query)
+            #DefaultMeta object is not iterable?
+            book_query = query.filter(Book.book_id.in_(Book_subjects)).order_by(Book.title).all()
             books = query.limit(10).all()
             count = query.count()
             print(books)
@@ -201,11 +204,14 @@ def book_detail(book_id):
 
     author = book.get_author()
     session["book_id"] = book.book_id
+    genres = []
+    summary = None
+    cover_img = None
 
     book_json = book.get_google_metadata()
-    if book_json:
+    if book_json["totalItems"] >= 1:
         summary, cover_img, genres = book.parse_metadata(book_json)
-    else:
+    elif book_json["totalItems"] < 1:
         response_ol = book.get_open_metadata()
         if response_ol:
             cover_img, summary, genres = book.parse_ol_metadata(response_ol)
