@@ -131,11 +131,12 @@ input[type=submit] {
         }
         //var optionValue = $(this).val();
         // var optionText = $('#dropdownList option[value="'+optionValue+'"]').text();
-        $.get('/search-books.json', searchData, (results)=> {
-           console.log(optionText);
+        $.get('/search-books.json', searchData, (response)=> {
+           showResults(response)
+           //TODO: Append these results to the search UI like I did before.
+        });
+      });
     });
-  });
-});
 </script>
      
 {% endblock %}

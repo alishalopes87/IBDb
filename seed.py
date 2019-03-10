@@ -72,7 +72,7 @@ def load_editions():
         publish_date=None
         subjects=None
         counter = counter + 1
-      
+        
 
         row = row.strip()
         # print(row)
@@ -102,7 +102,6 @@ def load_editions():
                 language=None
             else:
                 language = info_dict['languages'][0]['key'][11:]
-                
         if 'isbn_10' in info_dict:
             # print(info_dict['isbn_10'])
             if not info_dict['isbn_10']:
@@ -123,7 +122,6 @@ def load_editions():
             title = info_dict['title']
         else:
             title = None
-
        
 
         new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
@@ -160,37 +158,37 @@ def load_editions():
 
                     
            
-# # def load_associates():
+# def load_associates():
     
 
-# # load_editions()              
-# #                     #vagrant disk space?   
-# #         # db.session.commit()
+# load_editions()              
+#                     #vagrant disk space?   
+#         # db.session.commit()
        
 
                     
                         
             
-# # #             #trim each of elements 
-# # #             #strip to only numbers and letters
+# #             #trim each of elements 
+# #             #strip to only numbers and letters
 
 
 
-# #         # print(subject_table)       
-# #             #.remove or .split
-# #         #     rejex to write pattern
-# #         # subjects = "".join(subject_list)
-# #         #make for loop 
-# #         #check if added subjet before 
-# #         #label with id
-# #         #make subject table
-# #         #make a dictionary between subject name: subject id in db
-# #         #associate table between subject and book
-# #         #subjects reference table
-# #         #book subjects conecting bookid to subject id
+#         # print(subject_table)       
+#             #.remove or .split
+#         #     rejex to write pattern
+#         # subjects = "".join(subject_list)
+#         #make for loop 
+#         #check if added subjet before 
+#         #label with id
+#         #make subject table
+#         #make a dictionary between subject name: subject id in db
+#         #associate table between subject and book
+#         #subjects reference table
+#         #book subjects conecting bookid to subject id
     
     
-# # #         book = Book(isbn_10=isbn_10, isbn_13=isbn_13, title=title)
+# #         book = Book(isbn_10=isbn_10, isbn_13=isbn_13, title=title)
 
 
 # # def load_works():

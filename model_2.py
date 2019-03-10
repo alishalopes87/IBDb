@@ -10,6 +10,7 @@ from sqlalchemy import func
 import requests
 from datetime import datetime
 import os
+from math import ceil
 
 # from utils import Utils
 
@@ -141,10 +142,11 @@ class Book(db.Model):
                 
             if response_ol_json[isbnstring].get('excerpts'):
                 summary = response_ol_json[isbnstring]['excerpts'][0]['text']
+        genres = self.subjects
 
-            if 'subjects' in response_ol_json[isbnstring]: 
-                for subject in response_ol_json[isbnstring]['subjects'][:3]:
-                    genres.append(subject['name'])
+            # if 'subjects' in response_ol_json[isbnstring]: 
+            #     for subject in response_ol_json[isbnstring]['subjects'][:3]:
+            #         genres.append(subject['name'])
 
         return cover_img, summary, genres
 
@@ -156,7 +158,9 @@ class Book(db.Model):
         return response.json()
 
     def parse_metadata(self,book_json):
+        genres = []
         summary = None
+        cover_img = None
          # pragma: no cover
         if "description" in book_json["items"][0]["volumeInfo"]:
             summary = book_json["items"][0]["volumeInfo"]["description"]
@@ -177,6 +181,19 @@ class Book(db.Model):
 
 
         return summary, cover_img, genres
+
+    def search_results(self):
+        author = self.get_author()
+        book = {
+                'author':self.author_ol_id,
+                'book_id': self.book_id,
+                'title': self.title,
+                'book_url': '/Book/{}'.format(self.book_id),
+                'author_name': author.name,
+                'author_url': '/Author/{}'.format(author.author_id),
+                'language': self.language
+                }
+        return book 
 
 
 
@@ -304,7 +321,37 @@ class Book_shelf(db.Model):
             }
 
         return book_dict
+class Pagination(object):
 
+    def __init__(self, page, per_page, total_count):
+        self.page = page
+        self.per_page = per_page
+        self.total_count = total_count
+
+    @property
+    def pages(self):
+        return int(ceil(self.total_count / float(self.per_page)))
+
+    @property
+    def has_prev(self):
+        return self.page > 1
+
+    @property
+    def has_next(self):
+        return self.page < self.pages
+
+    def iter_pages(self, left_edge=2, left_current=2,
+                   right_current=5, right_edge=2):
+        last = 0
+        for num in xrange(1, self.pages + 1):
+            if num <= left_edge or \
+               (num > self.page - left_current - 1 and \
+                num < self.page + right_current) or \
+               num > self.pages - right_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num
 
 
 def connect_to_db(app):

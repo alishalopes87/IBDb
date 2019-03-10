@@ -11,6 +11,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from model_2 import *
 from pyisbn import convert as convert_isbn
+# from flask_paginate import Pagination, get_page_args
 import json
 
 
@@ -38,55 +39,66 @@ def filter_by_subject():
 @app.route('/search-books.json', methods=["POST", "GET"])
 def search_to_books():
 #languages =  bul
-
+    results = []
     keyword = request.args.get('book')
-    subjects = request.args.get('subject')
+    subject_input = request.args.get('subject')
     language = request.args.get('language')
     print(language)
-    print(subjects)
 
     if keyword:
         print(keyword)
     
-        if not subjects:
+        if not subject_input:
 
             query = db.session.query(Book)
-            query = search(query, keyword,sort=True)
-            books = books = query.limit(10).all()
+            #account for language
+            query = search(query, keyword, sort=True)
+            books = query.filter(Book.language==language).all()
+            books = query.limit(10).all()
             count = query.count()
+            for book in books:
+                book = book.search_results()
+                results.append(book)
 
         else:
 
-            query = db.session.query(Book).join(Book_subjects)
-            query = db.session.query(Book)
+            subject = Subject.query.filter(Subject.subject_name==subject_input).first()
+            query = (
+                db.session.query(Book)
+                    .join(Book_subjects)
+                    .filter(Book_subjects.subject_id==subject.subject_id)
+                )
+
             query = search(query, keyword,sort=True)
-            #DefaultMeta object is not iterable?
-            book_query = query.filter(Book.book_id.in_(Book_subjects)).order_by(Book.title).all()
             books = query.limit(10).all()
             count = query.count()
-            print(books)
+            for book in books:
+                book = book.search_results()
+                results.append(book)
 
-        results = []
-        for book in books:
-            author = book.get_author()
-            book = {
-            'author':book.author_ol_id,
-            'book_id': book.book_id,
-            'title': book.title,
-            'book_url': '/Book/{}'.format(book.book_id),
-            'author_name': author.name,
-            'author_url': '/Author/{}'.format(author.author_id)
-            }
+    elif subject_input:
 
-            results.append(book)
+        query = db.session.query(Subject)
 
+        query = search(query, subject_input, sort=True)
+        subjects = query.limit(10).all()
+        count = query.count()
+        
 
-    return jsonify(*results, {"count":count})
+        for subject in subjects:
+            for book in subject.books:
+                book = book.search_results()
+               
+
+                results.append(book)
+    print(results)
+
+    return jsonify({"results": results, "count":count })
 
 @app.route('/search-books')
 def search_books_form():
     """Search form for user to search books"""
-    book_languages = Book.query.filter(Book.language != None).all()
+    book_languages = Book.query.filter(Book.language != None).limit(1000).all()
 
     languages = set()
     for book in book_languages:
@@ -178,10 +190,39 @@ def user_detail(user_id):
 def book_list():
     """Show list of books."""
 
-    page = request.args.get('page', 1, type=int)
-    books = Book.query.paginate(page=page,per_page=50)
+    query = Book.query.all()
+    count = query.count()
+
+    #     page, per_page, offset = get_page_args(
+    #     page_parameter="page", per_page_parameter="per_page"
+    # )
+
+    # per_page =5
+
+    # offset = (page - 1) * per_page
+    # total = len(entries)
+
+    # pagination_entries = entries[offset : offset + per_page]
+    # pagination = Pagination(
+    #     page=page, per_page=per_page, total=total, css_framework="bootstrap4"
+    # )
+
+    # return render_template(
+    #     "all-entries.html",
+    #     entries=pagination_entries,
+    #     user=user,
+    #     page=page,
+    #     per_page=per_page,
+    #     pagination=pagination,
+    # )
+    # page = request.args.get('page', 1, type=int)
+    # books = Book.query.paginate(page,PER_PAGE=50)
+    # if not books and page !=1:
+    #     abort(404)
+
+
     # books = Book.query.order_by('title').all()
-    return render_template("book_list.html", books=books)
+    return render_template("book_list.html", books=books, pagination=pagination)
 
 @app.route("/Author/<int:author_id>", methods=['GET'])
 def author_info(author_id):
@@ -211,6 +252,7 @@ def book_detail(book_id):
     book_json = book.get_google_metadata()
     if book_json["totalItems"] >= 1:
         summary, cover_img, genres = book.parse_metadata(book_json)
+
     elif book_json["totalItems"] < 1:
         response_ol = book.get_open_metadata()
         if response_ol:
