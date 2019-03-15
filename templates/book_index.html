@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+  <header class="masthead" style="background-image: url('/static/library.jpg')">
+    <div class="overlay"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="page-heading">
+              <h2>{{ book.title }}</h2>
+                
+            </div>
+            </div>
+          </div>
+        </div>
+
+    </header>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-2 col-md-10 mx-auto">
+        {% if cover_img %}
+          <div id="book-img">
+            <span id ="cover-img">
+              <img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
+            </span>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div id="book-title">
+            <h1>{{ book.title }}</h1>
+          </div>
+
+          <div id="book-author">
+            <a href="/Author/{{ author }}">{{ author }}</a>
+          </div>
+        </div>
+      </div>
+
+      
+
+ 
+
+  {% if genres %}
+    <div id="book-genre">Genres:
+      <ul id="genres">
+        {% for genre in genres %}
+          <li> {{ genre }} </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+
+
+  {% if summary %}
+    <br>
+    <div id="book-summary">Summary: 
+      <span id="summary"> 
+        <div>
+        <p>{{ summary }}</p>
+      </div>
+      </span>
+    </div>
+  {% endif %}
+
+<div id="book-isbn">
+        {{ book.isbn_10 }}
+      </div>
+    </div>
+
+  
+
+
+
+{% endblock %}

@@ -7,6 +7,7 @@ function showResults(response){
     //TODO: Display this count somewhere on the page
     //(ps don't forget to to remove the old count)
    console.log(count)
+   console.log(response)
 
    if(Array.isArray(results)){
         for(let i in results){

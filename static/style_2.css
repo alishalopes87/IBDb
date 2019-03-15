@@ -1,0 +1,178 @@
+h1{
+    font-color: #555555;
+}
+body {
+  background-image: url(/static/img/library.jpg);
+  background-size: cover;
+  background-repeat: repeat;
+  background-position: center center;
+  color: white;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  height: 100%;
+  font-color: #555555;
+}
+a {
+  color: white;
+}
+.top-level{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+  font-color: white;
+
+}
+.middle{
+  flex: 1;
+  display: flex;
+  height: 25%
+  flex-direction: row wrap;
+ /* background-color: blue;*/
+  justify-content: space-around; 
+  font-family: Poppins-Regular, sans-serif;
+  font-color: #555555;
+}
+.bottom{
+  display: flex;
+  height: 100%;
+/*  justify-content: flex-start;*/
+  flex-direction: column wrap;
+  justisy-content: flex end;
+/*  background-color: orange*/
+}
+.top{
+ /* background-color: yellow;*/
+  height: 25%;
+  margin: auto;
+  font-color: white;
+  height: 100;
+}
+
+.btn{
+   font-size: 5px;
+   color: #1ab188;
+}
+}
+.book{
+  font-color: white;
+}
+label{
+  font-size: 10px;
+  font-color: white;
+}
+#genre {
+  justify-content: flex-end;
+  font-size: 10px;
+}
+
+
+#book-img{
+  height: 100%
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.real-top{
+  padding: 25px 50px 75px 100px;
+  display: flex
+  flex-direction: column;
+  align-items: flex-end;
+  height: 100;
+}
+#author{
+    justify-content: flex-end;
+    align-self: flex-end;
+}
+.header-buttons{
+  margin-top: 15px,
+  justify-content: flex-end;
+
+}
+.search-button{
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 12px;
+  min-width: 213px;
+  min-height: 20px;
+  text-align: center;
+  padding: 20px 10px 15px;
+  position: relative;
+  background-color: #fff;
+  margin-right: 10px;
+  border: 2px solid #40424a;
+  color: #40424a;
+  font-weight: 700;
+}
+.user-button{
+  display: inline-block;
+  text-transform: uppercase;
+  font-size: 12px;
+  min-width: 213px;
+  min-height: 20px;
+  text-align: center;
+  padding: 20px 10px 15px;
+  position: relative;
+  background-color: #fff;
+  margin-right: 10px;
+  border: 2px solid #40424a;
+  color: #40424a;
+  font-weight: 700;
+}
+h1{
+  font-color: white;
+}
+.main{
+  height: 100%;
+  width: 100%;
+}
+
+.top-level{
+   background: rgba(16, 10, 4, 0.6);
+   height: 100%;
+   width: 75%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    font-color: white;
+}
+
+h1.book{
+  font-color: white;
+}
+.save-author{
+  justify-content: flex-end;
+}
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #1ab188;
+  color: white;
+}
+
+/* Right-aligned section inside the top navigation */
+.topnav-right {
+  float: right;
+}

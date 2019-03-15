@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<style type="text/css">
+.pagination-page-info {
+    padding: .6em;
+    padding-left: 0;
+    width: 40em;
+    margin: .5em;
+    margin-left: 0;
+    font-size: 12px;
+}
+.pagination-page-info b {
+    color: black;
+    background: #6aa6ed;
+    padding-left: 2px;
+    padding: .1em .25em;
+    font-size: 150%;
+}
+</style>
+<div class="top-level">
+<nav></nav>
   <h1>Books</h1>
   <ul>
   {% for book in books.items %}
@@ -19,4 +37,6 @@
     <li class="page-item"><a class="page-link" href="#">Next</a></li>
   </ul>
 </nav>
+</div>
+</div>
 {% endblock %}

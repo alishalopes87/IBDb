@@ -6,12 +6,12 @@ from flask import (Flask, render_template, redirect, request, flash, session,jso
 from sqlalchemy.orm.attributes import flag_modified 
 import sqlalchemy as sa
 from sqlalchemy import func
-from sqlalchemy_searchable import search, parse_search_query
+from sqlalchemy_searchable import search
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from model_2 import *
 from pyisbn import convert as convert_isbn
-# from flask_paginate import Pagination, get_page_args
+from flask_paginate import Pagination, get_page_parameter
 import json
 
 
@@ -38,7 +38,7 @@ def filter_by_subject():
 
 @app.route('/search-books.json', methods=["POST", "GET"])
 def search_to_books():
-#languages =  bul
+    language=None
     results = []
     keyword = request.args.get('book')
     subject_input = request.args.get('subject')
@@ -46,19 +46,35 @@ def search_to_books():
     print(language)
 
     if keyword:
-        print(keyword)
+        #TODO FIX SO CAN SEARCH WITHOUT LANG
+        #results not appending sometimes when count is showing in 
     
         if not subject_input:
+            if language:
 
-            query = db.session.query(Book)
-            #account for language
-            query = search(query, keyword, sort=True)
-            books = query.filter(Book.language==language).all()
-            books = query.limit(10).all()
-            count = query.count()
-            for book in books:
-                book = book.search_results()
-                results.append(book)
+                query = db.session.query(Book)
+                #account for language
+                query = search(query, keyword, sort=True)
+                books = query.filter(Book.language==language).all()
+                # books = query.limit(10).all()
+                count = query.count()
+                for book in books:
+                    book = book.search_results()
+                    results.append(book)
+            else:
+                query = db.session.query(Book)
+                query = search(query, keyword, sort=True)
+                print(query)
+                books = query.limit(10).all()
+                print(books)
+                count = query.count()
+
+                for book in books:
+                    print(book)
+                    book = book.search_results()
+                    results.append(book)
+
+
 
         else:
 
@@ -70,7 +86,7 @@ def search_to_books():
                 )
 
             query = search(query, keyword,sort=True)
-            books = query.limit(10).all()
+            books = query.limit(1000).all()
             count = query.count()
             for book in books:
                 book = book.search_results()
@@ -81,7 +97,7 @@ def search_to_books():
         query = db.session.query(Subject)
 
         query = search(query, subject_input, sort=True)
-        subjects = query.limit(10).all()
+        subjects = query.limit(1000).all()
         count = query.count()
         
 
@@ -98,20 +114,24 @@ def search_to_books():
 @app.route('/search-books')
 def search_books_form():
     """Search form for user to search books"""
+
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+
     book_languages = Book.query.filter(Book.language != None).limit(1000).all()
 
     languages = set()
     for book in book_languages:
         languages.add(book.language)
 
-    return render_template('search.html',languages=languages)
+    return render_template('temp.html',user=user,languages=languages)
 
 @app.route('/')
 def indenx():
     """Homepage"""
     #deleting things from bookshelf
 
-    return render_template("login_form.html")
+    return render_template("index.html")
 
 @app.route('/register', methods=['GET'])
 def registration_form():
@@ -144,7 +164,7 @@ def register_process():
 def login_form():
     """Show login form."""
 
-    return render_template("login_form.html")
+    return render_template("index.html")
 
 @app.route('/login', methods=['POST'])
 def login_process():
@@ -186,43 +206,16 @@ def user_detail(user_id):
     return render_template("user.html", user=user)
 
 
-@app.route("/books")
-def book_list():
+@app.route("/books/<int:page_num>")
+def book_list(page_num):
     """Show list of books."""
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
 
-    query = Book.query.all()
-    count = query.count()
+    books = Book.query.paginate(per_page=20, page=page_num,error_out=True)
 
-    #     page, per_page, offset = get_page_args(
-    #     page_parameter="page", per_page_parameter="per_page"
-    # )
-
-    # per_page =5
-
-    # offset = (page - 1) * per_page
-    # total = len(entries)
-
-    # pagination_entries = entries[offset : offset + per_page]
-    # pagination = Pagination(
-    #     page=page, per_page=per_page, total=total, css_framework="bootstrap4"
-    # )
-
-    # return render_template(
-    #     "all-entries.html",
-    #     entries=pagination_entries,
-    #     user=user,
-    #     page=page,
-    #     per_page=per_page,
-    #     pagination=pagination,
-    # )
-    # page = request.args.get('page', 1, type=int)
-    # books = Book.query.paginate(page,PER_PAGE=50)
-    # if not books and page !=1:
-    #     abort(404)
-
-
-    # books = Book.query.order_by('title').all()
-    return render_template("book_list.html", books=books, pagination=pagination)
+    return render_template('book_list.html', user=user,books=books)
+    
 
 @app.route("/Author/<int:author_id>", methods=['GET'])
 def author_info(author_id):
@@ -241,6 +234,9 @@ def book_detail(book_id):
     if user if logged in 
     """
 
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
     book = Book.query.get(book_id)
 
     author = book.get_author()
@@ -257,14 +253,13 @@ def book_detail(book_id):
         response_ol = book.get_open_metadata()
         if response_ol:
             cover_img, summary, genres = book.parse_ol_metadata(response_ol)
+# book=book,
+#                             author=author,
+#                             summary=summary, 
+#                             cover_img=cover_img, 
+#                             genres=genres
 
-
-    return render_template("book.html",
-                            book=book,
-                            author=author,
-                            summary=summary, 
-                            cover_img=cover_img, 
-                            genres=genres)
+    return render_template("book.html",genres=genres,user=user,author=author,book=book,summary=summary,cover_img=cover_img)
 
 
 @app.route("/add_book/<int:book_id>",methods=['POST'])
@@ -350,7 +345,7 @@ def display_graph():
 if __name__ == "__main__":
     # We have to set debug=True here, since it has to be True at the
     # point that we invoke the DebugToolbarExtension
-    app.debug = True
+    app.debug = False
     # make sure templates, etc. are not cached in debug mode
     app.jinja_env.auto_reload = app.debug
 

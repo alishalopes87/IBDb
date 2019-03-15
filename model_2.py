@@ -20,7 +20,7 @@ from math import ceil
 
 db = SQLAlchemy()
 # utils = utils.Utils()
-make_searchable()
+make_searchable(db.metadata)
 GOOGLEKEY = os.environ.get("GOOGLEKEY")
 
 class BookQuery(BaseQuery,SearchQueryMixin):
@@ -358,8 +358,8 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///shelves'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///library'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.app = app
     db.init_app(app)
 

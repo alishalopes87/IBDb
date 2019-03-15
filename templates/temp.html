@@ -1,0 +1,86 @@
+{% extends 'base.html'%}
+{% block content %}
+
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <form id="getInfo" autocomplete="off" action="/search-books.json"class="login100-form validate-form">
+                    <span class="login100-form-title p-b-34">
+                        Search by title or author:
+                    </span>
+                    
+                    <div class="wrap-input100 rs1-wrap-input100 validate-input m-b-20" data-validate="Type user name">
+                        <input id="book" class="input100" type="text" name="book" placeholder="keyword">
+                        <span class="focus-input100"></span>
+                    </div>
+                    <div id="autocomplete"class="wrap-input100 rs2-wrap-input100 validate-input m-b-20">
+                        <input id="myInput" class="input100" type="text" name="subjects" placeholder="subject">
+                        <span class="focus-input100"></span>
+                    </div>
+                        <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Filter by language</label>
+                        <select id="language" name="language" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+                        <option selected>Filter by language</option>
+                        {% for language in languages %}
+                        <option id="language" name="language" value=>{{ language }}</option>
+                        {% endfor%}
+                        </select>
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn" type="submit" value="Submit">
+                            Submit
+                        </button>
+                    </div>
+
+                        <div class="custom-control custom-checkbox my-1 mr-sm-2">
+                        <input type="checkbox" name="language"class="custom-control-input" id="customControlInline">
+                        <label class="custom-control-label" for="customControlInline">Remember my preference</label>
+                      </div>
+                    </form>
+                </form>
+
+                <div class="login100-more" style="background-image: url('/static/img/library.jpg');"></div>
+            </div>
+        </div>
+    </div>
+    <div class="top-level">
+     <div id="count-result"></div>
+ <div id="book-results"></div>
+ </div>
+
+ <script src="/static/project.js"></script>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+        const dataFetcher = (request, response) => {
+          $.get('/search-subjects.json?subject=' + request.term, (results) => {
+              console.log(request.term)
+              console.log("results", results)
+              response([results])
+          });
+        }
+
+        $('#myInput').autocomplete({ source: dataFetcher })
+        console.log("hello")
+    });
+  </script>
+  <script type="text/javascript">
+
+   $(document).ready(function(){
+    $('#getInfo').on('submit', (evt) =>{
+      var optionText = $("#language option:selected").text();
+        evt.preventDefault();
+        const searchData ={
+          book: $('#book').val(),
+          subject: $('#myInput').val(),
+          language: optionText
+        }
+        //var optionValue = $(this).val();
+        // var optionText = $('#dropdownList option[value="'+optionValue+'"]').text();
+        $.get('/search-books.json', searchData, (response)=> {
+           showResults(response)
+           //TODO: Append these results to the search UI like I did before.
+        });
+      });
+    });
+</script>
+    
+    {% endblock %}
+    

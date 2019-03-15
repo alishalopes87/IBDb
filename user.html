@@ -1,0 +1,25 @@
+
+    
+{% extends 'base.html' %}
+{% block content %}
+
+  <h1>{{ user.fname }} {{ user.lname }}</h1>
+  <p>email: {{ user.email }}</p>
+
+  <div>
+    <a href="/search-books">search</a>
+    <a href="/books">books</a>
+  </div>
+
+  
+  <h2>Book_Shelf</h2>
+    <ul>
+    {% if user.book_shelves %}
+      {% for book_shelf in user.book_shelves %}
+      <li> Title: {{ book_shelf.books.title }} <form action="/delete_book/{{book_shelf.booking_id}}" method="POST"><button> Delete</button></form></li>
+    {% endfor %}
+    </ul>
+
+  {% endif %}
+
+{% endblock %}

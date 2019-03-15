@@ -1,15 +1,13 @@
+
+    
 {% extends 'base.html' %}
 {% block content %}
 
   <h1>{{ user.fname }} {{ user.lname }}</h1>
   <p>email: {{ user.email }}</p>
 
-  <div>
-    <a href="/search-books">search</a>
-    <a href="/books">books</a>
-  </div>
 
-  
+  <div class="top-level">
   <h2>Book_Shelf</h2>
     <ul>
     {% if user.book_shelves %}
@@ -19,5 +17,5 @@
     </ul>
 
   {% endif %}
-
+</div>
 {% endblock %}

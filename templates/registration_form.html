@@ -1,36 +1,44 @@
-{% extends 'base.html' %}
+{% extends 'index.html' %}
 {% block content %}
+<div class="limiter">
+    <div class="container-login100">
+      <div class="wrap-login100">
+        <form action="/register" method="POST"class="login100-form validate-form">
+          <span class="login100-form-title p-b-34">
+            Account Registration
+          </span>
+          <div class="wrap-input100 rs2-wrap-input100 validate-input m-b-20" data-validate="Type password">
+            <input class="input100" type="text" name="fname" required placeholder="First Name">
+            <span class="focus-input100"></span>
+          </div>
+          <div class="wrap-input100 rs2-wrap-input100 validate-input m-b-20" data-validate="Type password">
+            <input class="input100" type="text" name="lname" required placeholder="Last Name">
+            <span class="focus-input100"></span>
+          </div>
+            <div class="wrap-input100 rs2-wrap-input100 validate-input m-b-20" data-validate="Type password">
+            <input class="input100" type="text" name="age" required placeholder="age">
+            <span class="focus-input100"></span>
+          </div>
+          
+          <div class="wrap-input100 rs1-wrap-input100 validate-input m-b-20" data-validate="Type user name">
+            <input id="first-name" class="input100" type="text" type="email" name="email" placeholder="Email" required>
+            <span class="focus-input100"></span>
+          </div>
+          <div class="wrap-input100 rs2-wrap-input100 validate-input m-b-20" data-validate="Type password">
+            <input class="input100" type="password" name="password" required placeholder="Password">
+            <span class="focus-input100"></span>
+          </div>
+          
+          <div class="container-login100-form-btn">
+            <button class="login100-form-btn">
+              Sign in
+            </button>
+          </div>
+        </form>
 
-<h1>Register</h1>
-
-<form action="/register" method="POST">
-  <div class="form-row">
-    <div class="col-md-4 mb-3">
-      <label for="validationDefault01">First name</label>
-      <input name="fname" type="text" class="form-control" id="validationDefault01" placeholder="First name" value="Mark" required>
-    </div>
-    <div class="col-md-4 mb-3">
-      <label for="validationDefault02">Last name</label>
-      <input name="lname" type="text" class="form-control" id="validationDefault02" placeholder="Last name" value="Otto" required>
-    </div>
-    <div class="col-md-4 mb-3">
-      <label for="validationDefaultUsername">Email</label>
-      <div class="input-group">
-        </div>
-        <input name="email"type="text" class="form-control" id="validationDefaultUsername" placeholder="Email" aria-describedby="inputGroupPrepend2" required>
+        <div class="login100-more" style="background-image: url('/static/img/library.jpg');"></div>
       </div>
     </div>
   </div>
-  <div class="form-row">
-    <div class="col-md-6 mb-3">
-      <label for="validationDefault03">Password</label>
-      <input name="password" type="password" class="form-control" id="validationDefault03" placeholder="Password" required>
-    </div>
-    <div class="col-md-3 mb-3">
-      <label for="validationDefault04">Age</label>
-      <input name="age" type="text" class="form-control" id="validationDefault04" placeholder="Age" required>
-    </div>
-  </div>
-  <button class="btn btn-primary" type="submit">Submit form</button>
-</form>
+  
 {% endblock %}

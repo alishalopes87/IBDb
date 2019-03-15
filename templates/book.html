@@ -1,51 +1,66 @@
 {% extends 'base.html' %}
 {% block content %}
+<style type="text/css">
+/*#book-summary{
+  background-color: red;
+}*/
+/*.author{
+  justify-content: center;
+}
+.book-authors{
+  justify-content: center;
+}*/
+/*img {
+ width: 100%;
+ height: auto;
+}*/
+</style>
 
-  <h1 class='book'>{{ book.title }}</h1>
-  <h2>{{ author.name }}</h2>
-  <a href="/Author/{{ author.author_id }}">Want to see more by this author?</a>
-  
-   <div class="container">
-    <div class="row">
-      <div class="col-lg-2 col-md-10 mx-auto">
-        {% if cover_img %}
-          <div id="book-img">
-            <span id ="cover-img">
-              <img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail">
-            </span>
-          </div>
-        </div>
-        {% endif %}
-        
-
-  {% if genres %}
-    <div id="book-genre">Genres:
-      <ul id="genres">
-        {% for genre in genres %}
-          <li> {{ genre.subject_name }} </li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-
-
-
-  {% if summary %}
-    <br>
-    <div id="book-summary">Summary: 
-      <span id="summary"> 
-        <div>
-        <p>{{ summary }}</p>
-      </div>
-      </span>
-    </div>
-  {% endif %}
-<div>
-    <form action="/add_book/{{book.book_id}}" method="POST">
-Would you like to add this book to your book shelf? <button class='save'>Save</button>
-    </form>
+<div class="top-level">
+<div class="top">
+ <h1 class='book'>{{ book.title }}</h1>
+ <div class="book-authors"><h2 class-"author">by: {{ author.name }}</h2>
+  </div>
 </div>
 
+<div class="middle">
+  {% if cover_img %}
+  <div id="book-img">
+    <span id ="cover-img">
+      <img src="{{ cover_img }}" alt="Cover photo" id="cover-thumbnail"/>
+    </span>
+      <form action="/add_book/{{book.book_id}}" method="POST">
+    <label>Would you like to add this book to your book shelf?</label> <button class='save'>Save</button>
+  </form>
+  </div>
+  {% endif %}
+
+  {% if summary %}
+  <br>
+  <div id="book-summary">Summary: 
+      <p>{{ summary }}</p>
+  {% endif %}
+  </div>
+</div>
+
+<div class="bottom">
+   <a id="author" href="/Author/{{ author.author_id }}">Want to see more by this author?</a>
+
+  {% if genres %}
+  <div id="genre">Genres:
+    <ul>
+      {% for genre in genres %}
+      <li> {{ genre.subject_name }} </li>
+      {% endfor %}
+    </ul>
+     {% endif %}
+  </div>
+</div>
+
+
+
+</div>
+</div>
 {% endblock %}
 
 <script src="http://code.jquery.com/jquery.js"></script>

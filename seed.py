@@ -1,5 +1,6 @@
 from sqlalchemy import func
 # from datetime import datetime
+from sqlalchemy_searchable import make_searchable, search
 from model_2 import Book, User, Author, Subject, Book_subjects,Authors_books, connect_to_db, db
 from server import app 
 from sys import argv
@@ -33,31 +34,31 @@ def load_authors():
     enc = 'iso-8859-15'
     for row in open('seed_data/ol_authors.txt'):
         counter = counter + 1
-
+        
 
        
         row = row.strip()
         (info_type, ol_id, num, date, info_json)= row.split("\t")
 
         info_dict = json.loads(info_json)
-        # pprint(info_dict)
+        pprint(info_dict)
         author_ol_id = info_dict['key'][9:]
 
-        if 'name' in info_dict:
-            name = info_dict['name']
-            short_name = name[:100]
+        # if 'name' in info_dict:
+        #     name = info_dict['name']
+        #     short_name = name[:100]
     
 
-        author = Author(author_ol_id=author_ol_id, name=short_name)
+        # author = Author(author_ol_id=author_ol_id, name=short_name)
 
-        db.session.add(author)
-        if counter % 100000 == 0:
-            print("added 100000 authors", counter)
-            db.session.commit()
+        # db.session.add(author)
+        # if counter % 100000 == 0:
+        #     print("added 100000 authors", counter)
+        #     db.session.commit()
 
                 
 
-# load_authors()
+load_authors()
 
 def load_editions():
     counter = 0
@@ -98,6 +99,7 @@ def load_editions():
             publish_date = info_dict['publish_date']
            
         if 'languages' in info_dict:
+           
             if not info_dict['languages']:
                 language=None
             else:
@@ -123,7 +125,6 @@ def load_editions():
         else:
             title = None
        
-
         new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
             title=title, language=language, search_authors=search_authors,
             publishers=publishers, publish_date=publish_date)
@@ -206,13 +207,14 @@ def load_editions():
 
 # # # load_works()
 
-if __name__ == "__main__":
-    connect_to_db(app)
-    db.configure_mappers() 
-    # In case tables haven't been created, create them
-    # db.create_all()
+# if __name__ == "__main__":
+#     connect_to_db(app)
+#     make_searchable(db.metadata)
+#     db.configure_mappers() 
+#     # In case tables haven't been created, create them
+#     db.create_all()
     # load_authors()
-    load_editions()
+    #load_editions()
 
     # Import different types of data
    
