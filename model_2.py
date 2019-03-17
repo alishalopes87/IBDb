@@ -119,6 +119,7 @@ class Book(db.Model):
     def get_open_metadata(self):
         """get metadata from openlibrary"""
         isbn13 = self.isbn_13
+        print(isbn13)
 
         #use isbn-13 to get url for nearby library search
         if isbn13:

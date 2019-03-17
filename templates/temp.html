@@ -1,7 +1,7 @@
 {% extends 'base.html'%}
 {% block content %}
   <div class="topnav">
-  <a class="active" href="User/{{user.user_id}}">Home</a>
+  <a class="active" href="/User/{{user.user_id}}">Home</a>
   <a href="/books/1">Browse</a>
   <a href="/search-books">Search</a>
   <div class="topnav-right">
@@ -28,7 +28,7 @@
                     </div>
                         <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Filter by language</label>
                         <select id="language" name="language" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
-                        <option selected>Filter by language</option>
+                        <option id="placeholder" selected>Filter by language</option>
                         {% for language in languages %}
                         <option id="language" name="language" value=>{{ language }}</option>
                         {% endfor%}
@@ -74,7 +74,13 @@
 
    $(document).ready(function(){
     $('#getInfo').on('submit', (evt) =>{
-      var optionText = $("#language option:selected").text();
+      var optionText = $("#language option:selected")[0];
+      if (optionText.id == "placeholder") {
+        optionText = ''
+      } else {
+        optionText = optionText.text()
+      }
+
         evt.preventDefault();
         const searchData ={
           book: $('#book').val(),

@@ -43,26 +43,31 @@ def search_to_books():
     keyword = request.args.get('book')
     subject_input = request.args.get('subject')
     language = request.args.get('language')
-    print(language)
 
     if keyword:
+        print(keyword)
         #TODO FIX SO CAN SEARCH WITHOUT LANG
         #results not appending sometimes when count is showing in 
+        query = db.session.query(Book).filter(Book.isbn_13 != None)
     
         if not subject_input:
+            print(subject_input)
             if language:
+                print(language)
 
-                query = db.session.query(Book)
                 #account for language
                 query = search(query, keyword, sort=True)
-                books = query.filter(Book.language==language).all()
+                books = (
+                    query.filter(Book.language==language)
+                         .all()
+                )
                 # books = query.limit(10).all()
                 count = query.count()
                 for book in books:
                     book = book.search_results()
                     results.append(book)
             else:
-                query = db.session.query(Book)
+              
                 query = search(query, keyword, sort=True)
                 print(query)
                 books = query.limit(10).all()
@@ -80,7 +85,7 @@ def search_to_books():
 
             subject = Subject.query.filter(Subject.subject_name==subject_input).first()
             query = (
-                db.session.query(Book)
+                    query
                     .join(Book_subjects)
                     .filter(Book_subjects.subject_id==subject.subject_id)
                 )
@@ -246,11 +251,14 @@ def book_detail(book_id):
     cover_img = None
 
     book_json = book.get_google_metadata()
+    print(book_json)
     if book_json["totalItems"] >= 1:
         summary, cover_img, genres = book.parse_metadata(book_json)
 
     elif book_json["totalItems"] < 1:
+
         response_ol = book.get_open_metadata()
+        print(response_ol)
         if response_ol:
             cover_img, summary, genres = book.parse_ol_metadata(response_ol)
 # book=book,
