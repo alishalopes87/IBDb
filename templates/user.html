@@ -3,12 +3,22 @@
 {% extends 'base.html' %}
 {% block content %}
 
-  <h1>{{ user.fname }} {{ user.lname }}</h1>
+  <div class="topnav">
+  <a class="active" href="User/{{user.user_id}}">Home</a>
+  <a href="/books/1">Browse</a>
+  <a href="/search-books">Search</a>
+  <div class="topnav-right">
+    <a href="/logout">Log out</a>  
+  </div>
+</div>
+
+
+  <h1>{{ user.fname.title() }} {{ user.lname.title() }}</h1>
   <p>email: {{ user.email }}</p>
 
 
   <div class="top-level">
-  <h2>Book_Shelf</h2>
+  <h2>My Library</h2>
     <ul>
     {% if user.book_shelves %}
       {% for book_shelf in user.book_shelves %}

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #c1bdba;
+  font-family: 'Titillium Web', sans-serif; 
+  font-color: #1ab188;
+}
+
+/*the container must be positioned relative:*/
+.form {
+    background: rgba(19, 35, 47, 0.9);
+    padding: 40px;
+    max-width: 600px;
+    margin: 40px auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+}
+
+#autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+input {
+  border: 1px solid transparent;
+  background-color: #f1f1f1;
+  padding: 10px;
+  font-size: 16px;
+}
+
+input[type=text] {
+  background-color: #f1f1f1;
+  width: 100%;
+}
+
+input[type=submit] {
+  background-color: #1ab188;
+  color: #fff;
+  cursor: pointer;
+}
+label{
+  font-color: #1ab188;
+}
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  /*position the autocomplete items to be the same width as the container:*/
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+  
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #d4d4d4; 
+}
+
+/*when hovering an item:*/
+.autocomplete-items div:hover {
+  background-color: #e9e9e9; 
+}
+
+/*when navigating through the items using the arrow keys:*/
+.autocomplete-active {
+  background: #1ab188;
+  color: #ffffff;  
+}
+}
+.button-block {
+    background: #1ab188;
+  color: #ffffff; 
+}
+form {
+    background: rgba(19, 35, 47, 0.9);
+    padding: 40px;
+    max-width: 600px;
+    margin: 40px auto;
+    border-radius: 4px;
+    box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+}
+</style>
+</head>     
+
+  <h1></h1>
+  <div class="limiter">
+    <div class="container-login100">
+      <div class="wrap-login100">
+
+      <form id="getInfo" autocomplete="off" action="/search-books.json">
+    <label>Enter Title:
+    <input type="text" id="book" name="book"></input></label>
+    <input class="button-block" type="submit" value="Submit">
+
+      <p>Filter by subject:</p>
+
+<!--Make sure the form has the autocomplete function switched off:-->
+  <div id="autocomplete" style="width:300px;">
+    <input id="myInput" type="text" name="subjects" placeholder="subjects">
+  </div>
+  </div>
+  <label class="my-1 mr-2" for="inlineFormCustomSelectPref">Language</label>
+  <select id="language" name="language" class="custom-select my-1 mr-sm-2" id="inlineFormCustomSelectPref">
+    <option selected></option>
+    {% for language in languages %}
+    <option id="language" name="language" value=>{{ language }}</option>
+    {% endfor%}
+  </select>
+
+
+  <div class="custom-control custom-checkbox my-1 mr-sm-2">
+    <input type="checkbox" name="language"class="custom-control-input" id="customControlInline">
+    <label class="custom-control-label" for="customControlInline">Remember my preference</label>
+  </div>
+</form>
+
+ <div id="count-result"></div>
+ <div id="book-results"></div>
+
+ <div><label><b>Search Results:</label></div>
+ <script src="/static/project.js"></script>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+        const dataFetcher = (request, response) => {
+          $.get('/search-subjects.json?subject=' + request.term, (results) => {
+              console.log(request.term)
+              console.log("results", results)
+              response([results])
+          });
+        }
+
+        $('#myInput').autocomplete({ source: dataFetcher })
+        console.log("hello")
+    });
+  </script>
+  <script type="text/javascript">
+
+   $(document).ready(function(){
+    $('#getInfo').on('submit', (evt) =>{
+      var optionText = $("#language option:selected").text();
+        evt.preventDefault();
+        const searchData ={
+          book: $('#book').val(),
+          subject: $('#myInput').val(),
+          language: optionText
+        }
+        //var optionValue = $(this).val();
+        // var optionText = $('#dropdownList option[value="'+optionValue+'"]').text();
+        $.get('/search-books.json', searchData, (response)=> {
+           showResults(response)
+           //TODO: Append these results to the search UI like I did before.
+        });
+      });
+    });
+</script>
+     
+{% endblock %}
+
+

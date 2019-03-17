@@ -1,5 +1,14 @@
 {% extends 'base.html'%}
 {% block content %}
+  <div class="topnav">
+  <a class="active" href="User/{{user.user_id}}">Home</a>
+  <a href="/books/1">Browse</a>
+  <a href="/search-books">Search</a>
+  <div class="topnav-right">
+    <a href="/logout">Log out</a>  
+  </div>
+</div>
+
 
     <div class="limiter">
         <div class="container-login100">
