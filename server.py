@@ -129,7 +129,7 @@ def search_books_form():
     for book in book_languages:
         languages.add(book.language)
 
-    return render_template('temp.html',user=user,languages=languages)
+    return render_template('search.html',user=user,languages=languages)
 
 @app.route('/')
 def indenx():
