@@ -16,7 +16,7 @@
 }*/
 </style>
   <div class="topnav">
-  <a class="active" href="User/{{user.user_id}}">Home</a>
+  <a class="active" href="/User/{{user.user_id}}">Home</a>
   <a href="/books/1">Browse</a>
   <a href="/search-books">Search</a>
   <div class="topnav-right">
@@ -55,18 +55,6 @@
 
 <div class="bottom">
    <a id="author" href="/Author/{{ author.author_id }}">Want to see more by this author?</a>
-
-  {% if genres %}
-  <div id="genre">Genres:
-    <ul>
-      {% for genre in genres %}
-      <li> {{ genre.subject_name }} </li>
-      {% endfor %}
-    </ul>
-     {% endif %}
-  </div>
-</div>
-
 
 
 </div>

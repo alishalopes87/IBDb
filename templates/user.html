@@ -4,7 +4,7 @@
 {% block content %}
 
   <div class="topnav">
-  <a class="active" href="User/{{user.user_id}}">Home</a>
+  <a class="active" href="/User/{{user.user_id}}">Home</a>
   <a href="/books/1">Browse</a>
   <a href="/search-books">Search</a>
   <div class="topnav-right">
@@ -19,13 +19,13 @@
 
   <div class="top-level">
   <h2>My Library</h2>
-    <ul>
+    <ul id="bookUl">
     {% if user.book_shelves %}
       {% for book_shelf in user.book_shelves %}
-      <li> Title: {{ book_shelf.books.title }} <form action="/delete_book/{{book_shelf.booking_id}}" method="POST"><button> Delete</button></form></li>
+      <li class="shelf_element"><img height="201px" width="128px" style="object-fit: contain; background-color: grey;" src="{{ book_shelf.cover_img }}"><form action="/delete_book/{{book_shelf.booking_id}}" method="POST"><button> Delete</button></form></li>
     {% endfor %}
     </ul>
-
+  <a href="/graph">Library Graph</a>
   {% endif %}
 </div>
 {% endblock %}

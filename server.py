@@ -45,13 +45,10 @@ def search_to_books():
     language = request.args.get('language')
 
     if keyword:
-        print(keyword)
-        #TODO FIX SO CAN SEARCH WITHOUT LANG
-        #results not appending sometimes when count is showing in 
+        
         query = db.session.query(Book).filter(Book.isbn_13 != None)
     
         if not subject_input:
-            print(subject_input)
             if language:
                 print(language)
 
@@ -69,13 +66,13 @@ def search_to_books():
             else:
               
                 query = search(query, keyword, sort=True)
-                print(query)
+               
                 books = query.limit(10).all()
-                print(books)
+               
                 count = query.count()
 
                 for book in books:
-                    print(book)
+                   
                     book = book.search_results()
                     results.append(book)
 
@@ -112,7 +109,7 @@ def search_to_books():
                
 
                 results.append(book)
-    print(results)
+   
 
     return jsonify({"results": results, "count":count })
 
@@ -208,7 +205,24 @@ def user_detail(user_id):
     """Show info about user."""
 
     user = User.query.get(user_id)
-    return render_template("user.html", user=user)
+
+    if user.book_shelves:
+        for book_shelf in user.book_shelves:
+            book_json = book_shelf.books.get_google_metadata()
+            print(book_json)
+            if book_json["totalItems"] >= 1:
+                summary, cover_img, genres = book_shelf.books.parse_metadata(book_json)
+                book_shelf.cover_img = cover_img
+
+            elif book_json["totalItems"] < 1:
+
+                response_ol = book_shelf.books.get_open_metadata()
+                print(response_ol)
+                if response_ol:
+                    cover_img, summary, genres = book_shelf.books.parse_ol_metadata(response_ol)
+
+
+    return render_template("user.html", cover_img=cover_img, user=user)
 
 
 @app.route("/books/<int:page_num>")
@@ -261,11 +275,6 @@ def book_detail(book_id):
         print(response_ol)
         if response_ol:
             cover_img, summary, genres = book.parse_ol_metadata(response_ol)
-# book=book,
-#                             author=author,
-#                             summary=summary, 
-#                             cover_img=cover_img, 
-#                             genres=genres
 
     return render_template("book.html",genres=genres,user=user,author=author,book=book,summary=summary,cover_img=cover_img)
 

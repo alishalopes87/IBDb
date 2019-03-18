@@ -21,7 +21,14 @@ a {
   justify-content: flex-start;
   height: 100%;
   font-color: white;
+}
 
+#bookUl{
+  background: rgba(16,10,4,0.9)
+  flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
 .middle{
   flex: 1;
@@ -128,8 +135,8 @@ h1{
 }
 
 .top-level{
+  display: flex;
    background: rgba(16, 10, 4, 0.9);
-   height: 100%;
    width: 75%;
     padding-right: 15px;
     padding-left: 15px;

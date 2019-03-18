@@ -299,6 +299,7 @@ class Book_shelf(db.Model):
     # Define relationship to book
     books = db.relationship("Book")
 
+    cover_img = None 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
