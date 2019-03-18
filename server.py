@@ -231,9 +231,15 @@ def book_list(page_num):
     user_id = session.get('user_id')
     user = User.query.get(user_id)
 
-    books = Book.query.paginate(per_page=20, page=page_num,error_out=True)
+    books = (
+            Book
+            .query
+            .filter(Book.isbn_13 !=None)
+            .order_by(Book.title)
+            .paginate(per_page=20, page=page_num,error_out=True)
+            )
 
-    return render_template('book_list.html', user=user,books=books)
+    return render_template('book_list.html',page_num=page_num, user=user,books=books)
     
 
 @app.route("/Author/<int:author_id>", methods=['GET'])

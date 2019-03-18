@@ -2,7 +2,7 @@
 {% block content %}
   <div class="topnav">
   <a class="active" href="/User/{{user.user_id}}">Home</a>
-  <a href="/books/1">Browse</a>
+  <a href="/books/1000">Browse</a>
   <a href="/search-books">Search</a>
   <div class="topnav-right">
     <a href="/logout">Log out</a>  
@@ -13,7 +13,7 @@
     <div class="limiter">
         <div class="container-login100">
             <div class="wrap-login100">
-                <form id="getInfo" autocomplete="off" action="/search-books.json"class="login100-form validate-form">
+                <form id="getInfo" autocomplete="off" action="#" class="login100-form validate-form">
                     <span class="login100-form-title p-b-34">
                         Search by title or author:
                     </span>
@@ -74,8 +74,8 @@
 
    $(document).ready(function(){
     $('#getInfo').on('submit', (evt) =>{
-      var optionText = $("#language option:selected")[0];
-      if (optionText.id == "placeholder") {
+      var optionText = $("#language option:selected");
+      if (optionText[0].id == "placeholder") {
         optionText = ''
       } else {
         optionText = optionText.text()
