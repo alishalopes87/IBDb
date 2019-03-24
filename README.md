@@ -44,7 +44,7 @@ Install dependencies🔗:
 ```
 $ pip install -r requirements.txt
 ```
-Get your own secret keys🔑 for [Google](https://developers.google.com/books/docs/v1/getting_started)Save them to a file `secrets.py`. Your file should look something like this:
+Get your own secret keys🔑 for [Google Books](https://developers.google.com/books/docs/v1/getting_started) Save them to a file `secrets.py`. Your file should look something like this:
 ```
 
 APP_KEY = 'xyz'
