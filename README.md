@@ -10,7 +10,6 @@ Full stack web application that allows users to browse, search and save books to
 * [Tech Stack](#tech-stack)
 * [Setup/Installation](#installation)
 * [To-Do](#future)
-* [License](#license)
 
 ## <a name="tech-stack"></a>Tech Stack
 
