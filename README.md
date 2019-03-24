@@ -52,7 +52,7 @@ GOOGLEBOOK_API_KEY = 'abc'
 GOOGLEBOOK_API_SECRET = 'abc'
 
 
-and download Open Library dump datasets Authors and Editions [OpenLibrary](https://openlibrary.org/developers/dumps). 
+and download Open Library dump datasets Authors and Editions [Open Library](https://openlibrary.org/developers/dumps). 
 ```
 Create database 'Library'.
 ```
