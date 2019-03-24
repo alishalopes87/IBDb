@@ -1,8 +1,7 @@
+
 #IBDB
 # <img src="/static/img/library.jpg">
 
-
-IBDb allows user to browse, search, and save books to their personal library. By creating a faceted search system on top of open librarys dump dataset of 34GB, user are able to filter by subjects and language.
 
 ## Table of Contents🐛
 
