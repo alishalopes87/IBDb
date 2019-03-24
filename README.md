@@ -1,7 +1,9 @@
 
-#IBDB
+# IBDB
 # <img src="/static/img/library.jpg">
 
+## Overview:
+Full stack web application that allows users to browse, search and save books to their personal library.
 
 ## Table of Contents🐛
 
