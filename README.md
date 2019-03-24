@@ -44,15 +44,13 @@ Install dependencies🔗:
 ```
 $ pip install -r requirements.txt
 ```
-Get your own secret keys🔑 for [Google Books](https://developers.google.com/books/docs/v1/getting_started) Save them to a file `secrets.py`. Your file should look something like this:
+Download Open Library dump datasets Authors and Editions [Open Library](https://openlibrary.org/developers/dumps). And get your own secret keys🔑 for [Google Books](https://developers.google.com/books/docs/v1/getting_started) Save them to a file `secrets.py`. Your file should look something like this:
 ```
 
 APP_KEY = 'xyz'
 GOOGLEBOOK_API_KEY = 'abc'
 GOOGLEBOOK_API_SECRET = 'abc'
 
-
-and download Open Library dump datasets Authors and Editions [Open Library](https://openlibrary.org/developers/dumps). 
 ```
 Create database 'Library'.
 ```
