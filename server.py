@@ -131,7 +131,6 @@ def search_books_form():
 @app.route('/')
 def indenx():
     """Homepage"""
-    #deleting things from bookshelf
 
     return render_template("index.html")
 

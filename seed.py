@@ -159,65 +159,32 @@ def load_editions():
 
                     
            
-# def load_associates():
-    
-
-# load_editions()              
-#                     #vagrant disk space?   
-#         # db.session.commit()
-       
-
-                    
-                        
-            
-# #             #trim each of elements 
-# #             #strip to only numbers and letters
 
 
+def load_works():
+    counter = 0
+    for row in open('seed_data/ol_works.txt'):
+        counter = counter + 1
+        if counter > 1:
+            break
 
-#         # print(subject_table)       
-#             #.remove or .split
-#         #     rejex to write pattern
-#         # subjects = "".join(subject_list)
-#         #make for loop 
-#         #check if added subjet before 
-#         #label with id
-#         #make subject table
-#         #make a dictionary between subject name: subject id in db
-#         #associate table between subject and book
-#         #subjects reference table
-#         #book subjects conecting bookid to subject id
-    
-    
-# #         book = Book(isbn_10=isbn_10, isbn_13=isbn_13, title=title)
+        row = row.strip()
+        (info_type, ol_id, num, date, info_json)= row.split("\t")
+
+        info_dict = json.loads(info_json)
+        pprint(info_dict)
 
 
-# # def load_works():
-# #     counter = 0
-# #     for row in open('seed_data/ol_works.txt'):
-# #         counter = counter + 1
-# #         if counter > 1:
-# #             break
+if __name__ == "__main__":
+    connect_to_db(app)
+    make_searchable(db.metadata)
+    db.configure_mappers() 
+    # In case tables haven't been created, create them
+    db.create_all()
+    load_authors()
+    load_editions()
 
-# #         row = row.strip()
-# #         (info_type, ol_id, num, date, info_json)= row.split("\t")
 
-# #         info_dict = json.loads(info_json)
-# #         pprint(info_dict)
-
-# # # load_works()
-
-# if __name__ == "__main__":
-#     connect_to_db(app)
-#     make_searchable(db.metadata)
-#     db.configure_mappers() 
-#     # In case tables haven't been created, create them
-#     db.create_all()
-    # load_authors()
-    #load_editions()
-
-    # Import different types of data
-   
     
 
     
