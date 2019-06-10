@@ -16,7 +16,6 @@ def add_and_dedup_editions(book):
         db.session.add(book)
         return book
 
-#just add last edition 
 def add_and_dedup(subject):
     if Subject.query.filter(Subject.subject_name==subject.subject_name).all():
         return None
@@ -27,6 +26,8 @@ def get_author_name(author_ol_id):
     author = Author.query.filter(Author.author_ol_id==author_ol_id).first()
     if author:
         return author.name
+    else:
+        return None
 
 def load_authors():
     counter= 0
@@ -34,6 +35,8 @@ def load_authors():
     enc = 'iso-8859-15'
     for row in open('seed_data/ol_authors.txt'):
         counter = counter + 1
+        if counter == 1000000:
+            break
         
 
        
@@ -41,24 +44,22 @@ def load_authors():
         (info_type, ol_id, num, date, info_json)= row.split("\t")
 
         info_dict = json.loads(info_json)
-        pprint(info_dict)
         author_ol_id = info_dict['key'][9:]
 
-        # if 'name' in info_dict:
-        #     name = info_dict['name']
-        #     short_name = name[:100]
+        if 'name' in info_dict:
+            name = info_dict['name']
+            short_name = name[:100]
     
 
-        # author = Author(author_ol_id=author_ol_id, name=short_name)
+        author = Author(author_ol_id=author_ol_id, name=short_name)
 
-        # db.session.add(author)
-        # if counter % 100000 == 0:
-        #     print("added 100000 authors", counter)
-        #     db.session.commit()
+        db.session.add(author)
+        if counter % 100000 == 0:
+            print("added 100000 authors", counter)
+            db.session.commit()
 
                 
 
-load_authors()
 
 def load_editions():
     counter = 0
@@ -73,6 +74,8 @@ def load_editions():
         publish_date=None
         subjects=None
         counter = counter + 1
+        if counter == 10000:
+            break
         
 
         row = row.strip()
@@ -124,37 +127,43 @@ def load_editions():
             title = info_dict['title']
         else:
             title = None
-       
-        new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
-            title=title, language=language, search_authors=search_authors,
-            publishers=publishers, publish_date=publish_date)
-        if add_and_dedup_editions(new_book) == None:
+
+        if search_authors == None:
             continue
-        db.session.commit()
+        else:
 
-        if counter % 100000 == 0:
-            print("added 100 books", counter)
+            new_book = Book(isbn_10=isbn_10, isbn_13=isbn_13, author_ol_id =author_ol_id ,
+                title=title, language=language, search_authors=search_authors,
+                publishers=publishers, publish_date=publish_date)
+            print(new_book)
 
-        new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
-        db.session.add(new_author)
-        db.session.commit()
-        if counter % 100000 == 0:
-            print("added 100000 author_books", counter)
+            if add_and_dedup_editions(new_book) == None:
+                continue
+            db.session.commit()
+
+            if counter % 100000 == 0:
+                print("added 100 books", counter)
+
+            new_author = Authors_books(author_ol_id=new_book.author_ol_id, book_id=new_book.book_id)
+            db.session.add(new_author)
+            db.session.commit()
+            if counter % 100000 == 0:
+                print("added 100000 author_books", counter)
+                    
+
                 
+            if 'subjects' in info_dict:
+                subject_list = info_dict['subjects']
 
-            
-        if 'subjects' in info_dict:
-            subject_list = info_dict['subjects']
+                for subject in subject_list:
+                    new_subject = Subject(subject_name=subject)
+                    if add_and_dedup(new_subject) == None:
+                        continue
+                    db.session.commit()
 
-            for subject in subject_list:
-                new_subject = Subject(subject_name=subject)
-                if add_and_dedup(new_subject) == None:
-                    continue
-                db.session.commit()
-
-                new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
-                db.session.add(new_subject)
-                db.session.commit()
+                    new_subject = Book_subjects(book_id=new_book.book_id, subject_id= new_subject.subject_id)
+                    db.session.add(new_subject)
+                    db.session.commit()
                 
 
                     
@@ -207,14 +216,14 @@ def load_editions():
 
 # # # load_works()
 
-# if __name__ == "__main__":
-#     connect_to_db(app)
-#     make_searchable(db.metadata)
-#     db.configure_mappers() 
-#     # In case tables haven't been created, create them
-#     db.create_all()
+if __name__ == "__main__":
+    connect_to_db(app)
+    make_searchable(db.metadata)
+    db.configure_mappers() 
+    # In case tables haven't been created, create them
+    db.create_all()
     # load_authors()
-    #load_editions()
+    load_editions()
 
     # Import different types of data
    

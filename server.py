@@ -50,7 +50,6 @@ def search_to_books():
     
         if not subject_input:
             if language:
-                print(language)
 
                 #account for language
                 query = search(query, keyword, sort=True)
@@ -203,13 +202,15 @@ def logout():
 @app.route("/User/<int:user_id>", methods=['GET', 'POST'])
 def user_detail(user_id):
     """Show info about user."""
+    cover_img = None
+    summary = None
+    genres = None 
 
     user = User.query.get(user_id)
 
     if user.book_shelves:
         for book_shelf in user.book_shelves:
             book_json = book_shelf.books.get_google_metadata()
-            print(book_json)
             if book_json["totalItems"] >= 1:
                 summary, cover_img, genres = book_shelf.books.parse_metadata(book_json)
                 book_shelf.cover_img = cover_img
@@ -217,7 +218,6 @@ def user_detail(user_id):
             elif book_json["totalItems"] < 1:
 
                 response_ol = book_shelf.books.get_open_metadata()
-                print(response_ol)
                 if response_ol:
                     cover_img, summary, genres = book_shelf.books.parse_ol_metadata(response_ol)
 
@@ -271,14 +271,12 @@ def book_detail(book_id):
     cover_img = None
 
     book_json = book.get_google_metadata()
-    print(book_json)
     if book_json["totalItems"] >= 1:
         summary, cover_img, genres = book.parse_metadata(book_json)
 
     elif book_json["totalItems"] < 1:
 
         response_ol = book.get_open_metadata()
-        print(response_ol)
         if response_ol:
             cover_img, summary, genres = book.parse_ol_metadata(response_ol)
 
@@ -346,7 +344,6 @@ def create_graph_data():
         links.append({"source": user["id"], "target": book_dict["id"]})
 
         subjects = book.books.get_subjects()
-        print(subjects)
         for subject in subjects:
             subject_dict = subject.convert_info()
             nodes.append(subject_dict)
